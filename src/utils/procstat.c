@@ -1,5 +1,6 @@
 #include "procstat.h"
 #include "log.h"
+#include "file.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -8,6 +9,8 @@
 
 #define MAX_FILE_LINE_LENGTH 4096u
 #define MAX_FILE_LINE_COUNT 2048u
+#define MAX_EXPECTED_PROCSTAT_LENGTH 16384u
+#define FILE_NAME "/proc/stat"
 
 
 /**
@@ -103,11 +106,26 @@ ProcStat_t* ProcStat_create(void)
 }
 
 
-ProcStat_t* ProcStat_parseFrom(const char* fileContent)
+ProcStat_t* ProcStat_loadFromFile(void)
+{
+	char fBuf[MAX_EXPECTED_PROCSTAT_LENGTH];
+	const size_t fBufSz = sizeof fBuf / sizeof *fBuf;
+
+	// Either no data has been read or error has occured, abort
+	if (File_readContentInto(FILE_NAME, fBuf, fBufSz) < 1)
+	{
+		return NULL;
+	}
+
+	return parse(fBuf);
+}
+
+
+ProcStat_t* ProcStat_parse(const char* fileContent)
 {
 	if (NULL == fileContent)
 	{
-		Log_Error("invalid argument provided: fileContent");
+		LogError("invalid argument provided: fileContent");
 		return NULL;
 	}
 
@@ -118,7 +136,7 @@ ProcStat_t* ProcStat_parseFrom(const char* fileContent)
 
 	if (NULL == copy)
 	{
-		Log_Error("cannot allocate memory for content buffer");
+		LogError("cannot allocate memory for content buffer");
 		return NULL;
 	}
 

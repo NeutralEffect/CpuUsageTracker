@@ -7,7 +7,7 @@
 #define MESSAGE_BUFFER_SIZE 2048u
 
 
-void Log_Error(const char* format, ...)
+void LogError(const char* format, ...)
 {
 	char msgbuf[MESSAGE_BUFFER_SIZE];
 
@@ -19,7 +19,7 @@ void Log_Error(const char* format, ...)
 }
 
 
-void Log_Info(const char* format, ...)
+void LogInfo(const char* format, ...)
 {
 	char msgbuf[MESSAGE_BUFFER_SIZE];
 
@@ -31,7 +31,7 @@ void Log_Info(const char* format, ...)
 }
 
 
-void Log_Warning(const char* format, ...)
+void LogWarning(const char* format, ...)
 {
 	char msgbuf[MESSAGE_BUFFER_SIZE];
 
