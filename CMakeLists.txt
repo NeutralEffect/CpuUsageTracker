@@ -6,7 +6,10 @@ project(CpuUsageTracker
 	
 add_executable(${PROJECT_NAME} app/app.c)
 
+# Those directives could be moved to CMakeLists.txt inside /libs
 add_dependencies(${PROJECT_NAME} CircularBuffer)
+target_include_directories(${PROJECT_NAME} PRIVATE circbuf)
+target_link_libraries(${PROJECT_NAME} CircularBuffer)
 
 add_subdirectory(libs)
 add_subdirectory(src)

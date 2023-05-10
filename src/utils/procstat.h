@@ -3,6 +3,27 @@
 #include <stddef.h>
 
 
+typedef struct ProcStat ProcStat_t;
+
+
+/**
+ * \brief Create new, blank ProcStat structure with enough capacity to hold information about this system's CPUs.
+ * \return Pointer to newly created ProcStat structure, or NULL in case of malloc failure.
+ * \warning Resulting structure has to be manually deallocated by user once no longer needed.
+*/
+ProcStat_t* ProcStat_create(void);
+
+
+/**
+ * \brief Parses contents of /proc/stat file into specialized structure.
+ * \param fileContent Contents of /proc/stat file.
+ * \return Pointer to dynamically-allocated structure containing data extracted
+ * from file contents if successful, NULL in case of failure.
+ * \warning The resulting structure has to be deallocated manually by the user.
+*/
+ProcStat_t* ProcStat_parseFrom(const char* fileContent);
+
+
 typedef enum CpuStatIndex
 {
 	CSINDEX_USER = 0,
@@ -21,21 +42,16 @@ CpuStatIndex_t;
 
 typedef struct CpuStat
 {
-	long values[10];
+	unsigned long long values[10];
 }
 CpuStat_t;
 
 
-typedef struct ProcStat
+struct ProcStat
 {
-	CpuStat_t cpuStatTotal;
-	size_t cpuStatsLength;
-	CpuStat_t cpuStats[];
-}
-ProcStat_t;
-
-
-ProcStat_t* ProcStat_parse(const char* fileContent);
+	size_t 		cpuStatsLength;
+	CpuStat_t 	cpuStats[];
+};
 
 
 #endif // !PROCSTAT_H_INCLUDED
