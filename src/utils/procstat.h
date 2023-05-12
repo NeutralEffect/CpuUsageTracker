@@ -15,6 +15,13 @@ ProcStat_t* ProcStat_create(void);
 
 
 /**
+ * \brief Retrieve size of struct ProcStat on this system.
+ * \return Size of struct ProcStat in bytes.
+*/
+size_t ProcStat_getSize(void);
+
+
+/**
  * \brief Reads /proc/stat file and parses it's content into specialized structure.
  * \return Pointer to dynamically-allocated structure containing data extracted
  * from file contents if successful, NULL in case of failure.

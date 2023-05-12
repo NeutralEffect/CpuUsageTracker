@@ -7,18 +7,18 @@
 #include <sys/sysinfo.h>
 
 
-#define MAX_FILE_LINE_LENGTH 4096u
 #define MAX_FILE_LINE_COUNT 2048u
 #define MAX_EXPECTED_PROCSTAT_LENGTH 16384u
-#define FILE_NAME "/proc/stat"
+#define FILE_PATH "/proc/stat"
 
 
 /**
- * \brief Get number of available logical processors.
- * Current implementation is a wrapper for get_nprocs.
- * \return Number of processors.
+ * \brief Retrieves amount of available logical processors in the system.
+ * \warning This function will always return the same value,
+ * even if amount of available processors changes during program's runtime.
+ * \return Amount of available processors.
 */
-static inline int getProcessorCount(void)
+static inline int getCpuCount(void)
 {
 	return get_nprocs();
 }
@@ -59,7 +59,7 @@ static ProcStat_t* parse(char* mutableFileContent)
 	 * we can safely take only those first lines from it and ignore others.
 	 * Adding one to account for total "cpu" line.
 	 */
-	const int significantLinesCount = getProcessorCount() + 1;
+	const int significantLinesCount = getCpuCount() + 1;
 
 	// Scan "cpu(N)" lines into structure
 	for (int ii = 0; ii < significantLinesCount; ++ii)
@@ -86,8 +86,7 @@ static ProcStat_t* parse(char* mutableFileContent)
 ProcStat_t* ProcStat_create(void)
 {
 	// Add one to account for total "cpu" line
-	const int cpuCount = getProcessorCount() + 1;
-	const size_t size = sizeof(ProcStat_t) + sizeof(CpuStat_t) * cpuCount;
+	const size_t size = ProcStat_getSize();
 	ProcStat_t* result = malloc(size);
 
 	if (NULL == result)
@@ -95,14 +94,20 @@ ProcStat_t* ProcStat_create(void)
 		return NULL;
 	}
 
-	/* Initialize all fields to 0.
-	 * Could be split into two calls to avoid setting result->cpuStatsLength to zero as well,
-	 * but the overhead of function call is likely higher than that of overwriting a few more bytes.
-	 */
+	// Initialize all fields to 0.
+	// Could be split into two calls to avoid setting result->cpuStatsLength to zero as well,
+	// but the overhead of function call is likely higher than that of overwriting a few more bytes.
 	memset(result, 0, size);
 	// Save CPU count.
-	result->cpuStatsLength = cpuCount;
+	result->cpuStatsLength = getCpuCount() + 1;
 	return result;
+}
+
+
+size_t ProcStat_getSize(void)
+{
+	size_t size = sizeof(ProcStat_t) + (getCpuCount() + 1) * sizeof(CpuStat_t);
+	return size;
 }
 
 
@@ -112,7 +117,7 @@ ProcStat_t* ProcStat_loadFromFile(void)
 	const size_t fBufSz = sizeof fBuf / sizeof *fBuf;
 
 	// Either no data has been read or error has occured, abort
-	if (File_readContentInto(FILE_NAME, fBuf, fBufSz) < 1)
+	if (File_readContentInto(FILE_PATH, fBuf, fBufSz) < 1)
 	{
 		return NULL;
 	}
