@@ -104,6 +104,17 @@ ProcStat_t* ProcStat_create(void)
 }
 
 
+void ProcStat_destroy(ProcStat_t* self)
+{
+	if (NULL == self)
+	{
+		return;
+	}
+
+	free(self);
+}
+
+
 size_t ProcStat_getSize(void)
 {
 	size_t size = sizeof(ProcStat_t) + (getCpuCount() + 1) * sizeof(CpuStat_t);

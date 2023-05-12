@@ -15,6 +15,13 @@ ProcStat_t* ProcStat_create(void);
 
 
 /**
+ * \brief Destroy ProcStat structure deallocating memory and cleaning up any resources used.
+ * \param self Pointer to ProcStat_t structure to be destroyed.
+*/
+void ProcStat_destroy(ProcStat_t* self);
+
+
+/**
  * \brief Retrieve size of struct ProcStat on this system.
  * \return Size of struct ProcStat in bytes.
 */
