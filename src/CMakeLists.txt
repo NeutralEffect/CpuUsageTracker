@@ -10,4 +10,5 @@ target_sources(${PROJECT_NAME}
 		${CMAKE_CURRENT_SOURCE_DIR}/threads/reader.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/file.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/log.c
-		${CMAKE_CURRENT_SOURCE_DIR}/utils/procstat.c)
+		${CMAKE_CURRENT_SOURCE_DIR}/utils/procstat.c
+		${CMAKE_CURRENT_SOURCE_DIR}/utils/thread_utils.c)
