@@ -52,6 +52,12 @@ int Mutex_tryLockMs(mtx_t* mutex, unsigned waitTimeMs)
 }
 
 
+int Mutex_unlock(mtx_t* mutex)
+{
+	return mtx_unlock(mutex);
+}
+
+
 int Thread_sleep(unsigned seconds)
 {
 	return thrd_sleep(&(struct timespec) { .tv_sec = seconds, .tv_nsec = 0 }, NULL);

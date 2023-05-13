@@ -43,6 +43,14 @@ int Mutex_tryLockMs(mtx_t* mutex, unsigned waitTimeMs);
 
 
 /**
+ * \brief Unlocks provided mutex.
+ * \param mutex Mutex to be unlocked.
+ * \return thrd_success if succesful, thrd_error otherwise.
+*/
+int Mutex_unlock(mtx_t* mutex);
+
+
+/**
  * \brief Blocks the execution of the current for at least specified amount of time.
  * \param seconds Amount of time for thread to be blocked for, in seconds.
  * \return 0 if successful, -1 in case of interrupt, other negative value in case of error.
