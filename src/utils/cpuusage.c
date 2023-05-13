@@ -5,13 +5,6 @@
 #include <stdio.h>
 
 
-static PercentageValue_t calculatePercentage(CpuStatValue_t a, CpuStatValue_t b)
-{
-	float percentage = ((float) a) / b;
-	return (PercentageValue_t)(percentage * 100);
-}
-
-
 /**
  * \brief Calculates CPU usage percentage. Formula taken from https://stackoverflow.com/a/23376195.
 */
@@ -47,7 +40,7 @@ static PercentageValue_t calculateCpuUsagePercentage(const CpuStat_t* oldStat, c
 	CpuStatValue_t totald = total - prevTotal;
 	CpuStatValue_t idled = idle - prevIdle;
 
-	PercentageValue_t result = calculatePercentage(totald - idled, totald);
+	PercentageValue_t result = ((float) totald - idled) / totald;
 	return result;
 }
 

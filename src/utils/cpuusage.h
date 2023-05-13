@@ -4,7 +4,7 @@
 #include "procstat.h"
 
 
-typedef unsigned PercentageValue_t;
+typedef double PercentageValue_t;
 
 
 typedef struct CpuUsageInfo
