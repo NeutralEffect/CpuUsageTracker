@@ -9,14 +9,14 @@
 static void sigintHandler(int signum)
 {
 	(void) signum;
-	Thread_setKillSwitchStatus(true);
+	Thread_activateKillSwitch();
 }
 
 
 static void sigtermHandler(int signum)
 {
 	(void) signum;
-	Thread_setKillSwitchStatus(true);
+	Thread_activateKillSwitch();
 }
 
 

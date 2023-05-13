@@ -7,7 +7,7 @@
 typedef struct ReaderThreadParams
 {
 	mtx_t* mutex;
-	CircularBuffer_t* dataBuffer;
+	CircularBuffer_t* buffer;
 }
 ReaderThreadParams_t;
 
@@ -19,8 +19,8 @@ ReaderThreadParams_t;
  * into circular buffer provided through params. Those writes will be only performed if provided
  * mutex is available, as it will be locked for their entire duration.
  * Field mutex of params should point to valid mutex which will be used for synchronizing
- * operations on dataBuffer.
- * Field dataBuffer of params should point to valid CircularBuffer_t structure capable of holding
+ * operations on buffer.
+ * Field buffer of params should point to valid CircularBuffer_t structure capable of holding
  * at least one ProcStat_t structure.
  * \param params Pointer to valid ReaderThreadParams_t structure.
 */

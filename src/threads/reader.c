@@ -36,7 +36,7 @@ int ReaderThread(void* rawParams)
 			if (thrd_success == Mutex_tryLockMs(params->mutex, MUTEX_WAIT_TIME_MS))
 			{
 				// Mutex acquired, write procstat
-				CircularBuffer_write(params->dataBuffer, procStat);
+				CircularBuffer_write(params->buffer, procStat);
 				// Unlock mutex so analyzer thread can access it
 				Mutex_unlock(params->mutex);
 				

@@ -1,20 +1,20 @@
 #ifndef ANALYZER_H_INCLUDED
 #define ANALYZER_H_INCLUDED
-#include "circbuf.h"
 #include <threads.h>
+#include "circbuf.h"
 
 
 typedef struct AnalyzerThreadParams
 {
-	mtx_t* inputDataMutex;
-	CircularBuffer_t* inputDataBuffer;
-	mtx_t* outputDataMutex;
-	CircularBuffer_t* outputDataBuffer;
+	mtx_t* inputMutex;
+	CircularBuffer_t* inputBuffer;
+	mtx_t* outputMutex;
+	CircularBuffer_t* outputBuffer;
 }
 AnalyzerThreadParams_t;
 
 
-int AnalyzerThread(void* param);
+int AnalyzerThread(void* params);
 
 
 #endif // !ANALYZER_H_INCLUDED

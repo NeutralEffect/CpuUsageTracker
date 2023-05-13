@@ -18,7 +18,7 @@
  * \param mutex Mutex to lock on before reading from circular buffer.
  * \param cbuf Circular buffer to read data from.
  * \param output Buffer to write resulting data into.
- * \return 0 if successful, -1 if interrupted, other negative value on error.
+ * \return 0 if successful, negative value on error.
 */
 static int waitForData(mtx_t* mutex, CircularBuffer_t* cbuf, void* output)
 {
@@ -46,6 +46,8 @@ static int waitForData(mtx_t* mutex, CircularBuffer_t* cbuf, void* output)
 		else if (thrd_error == mtxstatus)
 		{
 			Log(LLEVEL_ERROR, "cannot acquire mutex");
+			result = -1;
+			break;
 		}
 
 		Thread_sleep(SLEEP_TIME_SECONDS);
@@ -69,7 +71,7 @@ static int readDataTimeout(mtx_t* mutex, CircularBuffer_t* cbuf, void* output, u
 
 	if (!CircularBuffer_read(cbuf, output))
 	{
-		result = -3;
+		result = 1;
 	}
 
 	if (thrd_success != Mutex_unlock(mutex))
@@ -115,7 +117,7 @@ int AnalyzerThread(void* rawParams)
 	}
 
 	while (
-		(0 != waitForData(params->inputDataMutex, params->inputDataBuffer, oldStatBuffer)) &&
+		(0 != waitForData(params->inputMutex, params->inputBuffer, oldStatBuffer)) &&
 		(false == Thread_getKillSwitchStatus()))
 		;
 
@@ -135,55 +137,63 @@ int AnalyzerThread(void* rawParams)
 	// Main loop
 	while (false == Thread_getKillSwitchStatus())
 	{
-		const int status = readDataTimeout(params->inputDataMutex, params->inputDataBuffer, newStatBuffer, MUTEX_WAIT_TIME_MS);
+		const int dataReadStatus = readDataTimeout(params->inputMutex, params->inputBuffer, newStatBuffer, MUTEX_WAIT_TIME_MS);
 
-		if (0 == status)
+		switch (dataReadStatus)
 		{
-			CpuUsageInfo_calculate(oldStatBuffer, newStatBuffer, usageInfoBuffer);
-
-			if (thrd_success == Mutex_tryLockMs(params->outputDataMutex, MUTEX_WAIT_TIME_MS))
+			case 0:
 			{
-				CircularBuffer_write(params->outputDataBuffer, usageInfoBuffer);
-				Mutex_unlock(params->outputDataMutex);
-				Log(LLEVEL_DEBUG, "analyzer: usage stats sent");
+				CpuUsageInfo_calculate(oldStatBuffer, newStatBuffer, usageInfoBuffer);
+
+				if (thrd_success == Mutex_tryLockMs(params->outputMutex, MUTEX_WAIT_TIME_MS))
+				{
+					CircularBuffer_write(params->outputBuffer, usageInfoBuffer);
+					Mutex_unlock(params->outputMutex);
+					Log(LLEVEL_DEBUG, "analyzer: usage stats sent");
+				}
+
+				Log(LLEVEL_TRACE, "analyzer old: %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
+					oldStatBuffer->cpuStats[0].values[0],
+					oldStatBuffer->cpuStats[0].values[1],
+					oldStatBuffer->cpuStats[0].values[2],
+					oldStatBuffer->cpuStats[0].values[3],
+					oldStatBuffer->cpuStats[0].values[4],
+					oldStatBuffer->cpuStats[0].values[5],
+					oldStatBuffer->cpuStats[0].values[6],
+					oldStatBuffer->cpuStats[0].values[7],
+					oldStatBuffer->cpuStats[0].values[8],
+					oldStatBuffer->cpuStats[0].values[9]);
+
+				Log(LLEVEL_TRACE, "analyzer new: %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
+					newStatBuffer->cpuStats[0].values[0],
+					newStatBuffer->cpuStats[0].values[1],
+					newStatBuffer->cpuStats[0].values[2],
+					newStatBuffer->cpuStats[0].values[3],
+					newStatBuffer->cpuStats[0].values[4],
+					newStatBuffer->cpuStats[0].values[5],
+					newStatBuffer->cpuStats[0].values[6],
+					newStatBuffer->cpuStats[0].values[7],
+					newStatBuffer->cpuStats[0].values[8],
+					newStatBuffer->cpuStats[0].values[9]);
+
+				// Swap buffer pointers, so that in next iteration fresh data will overwrite oldest data
+				ProcStat_t* tmp = oldStatBuffer;
+				oldStatBuffer = newStatBuffer;
+				newStatBuffer = tmp;
 			}
+			break;
 
-			Log(LLEVEL_TRACE, "analyzer old: %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
-				oldStatBuffer->cpuStats[0].values[0],
-				oldStatBuffer->cpuStats[0].values[1],
-				oldStatBuffer->cpuStats[0].values[2],
-				oldStatBuffer->cpuStats[0].values[3],
-				oldStatBuffer->cpuStats[0].values[4],
-				oldStatBuffer->cpuStats[0].values[5],
-				oldStatBuffer->cpuStats[0].values[6],
-				oldStatBuffer->cpuStats[0].values[7],
-				oldStatBuffer->cpuStats[0].values[8],
-				oldStatBuffer->cpuStats[0].values[9]);
+			case 1:
+			{
+				Log(LLEVEL_WARNING, "analyzer: procstat data unavailable");
+			}
+			break;
 
-			Log(LLEVEL_TRACE, "analyzer new: %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
-				newStatBuffer->cpuStats[0].values[0],
-				newStatBuffer->cpuStats[0].values[1],
-				newStatBuffer->cpuStats[0].values[2],
-				newStatBuffer->cpuStats[0].values[3],
-				newStatBuffer->cpuStats[0].values[4],
-				newStatBuffer->cpuStats[0].values[5],
-				newStatBuffer->cpuStats[0].values[6],
-				newStatBuffer->cpuStats[0].values[7],
-				newStatBuffer->cpuStats[0].values[8],
-				newStatBuffer->cpuStats[0].values[9]);
-
-			// Swap buffer pointers, so that in next iteration fresh data will overwrite oldest data
-			ProcStat_t* tmp = oldStatBuffer;
-			oldStatBuffer = newStatBuffer;
-			newStatBuffer = tmp;
-		}
-		else if (-1 != status)
-		{
-			Log(LLEVEL_ERROR, "analyzer: error while attempting to receive procstat data");
-		}
-		else
-		{
-			Log(LLEVEL_WARNING, "analyzer: procstat data unavailable");
+			default:
+			{
+				Log(LLEVEL_ERROR, "analyzer: error while attempting to receive procstat data");
+			}
+			break;
 		}
 
 		Thread_sleep(SLEEP_TIME_SECONDS);

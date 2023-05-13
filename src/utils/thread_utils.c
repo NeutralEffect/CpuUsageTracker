@@ -27,9 +27,9 @@ bool Thread_getKillSwitchStatus(void)
 }
 
 
-void Thread_setKillSwitchStatus(bool status)
+void Thread_activateKillSwitch()
 {
-	killSwitch = status;
+	killSwitch = true;
 }
 
 

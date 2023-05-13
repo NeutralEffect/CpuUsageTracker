@@ -12,10 +12,9 @@ bool Thread_getKillSwitchStatus(void);
 
 
 /**
- * \brief Atomically set new status for kill switch.
- * \param status New status.
+ * \brief Activate kill switch, atomically setting it's value.
 */
-void Thread_setKillSwitchStatus(bool status);
+void Thread_activateKillSwitch();
 
 
 /**
