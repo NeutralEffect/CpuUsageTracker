@@ -9,7 +9,7 @@ typedef struct AnalyzerThreadParams
 	mtx_t* inputMutex;
 	CircularBuffer_t* inputBuffer;
 	mtx_t* outputMutex;
-	CircularBuffer_t* outputBuffer;
+	CpuUsageInfo_t* outputBuffer;
 }
 AnalyzerThreadParams_t;
 

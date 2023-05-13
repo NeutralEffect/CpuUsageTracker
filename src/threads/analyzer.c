@@ -57,6 +57,15 @@ static int waitForData(mtx_t* mutex, CircularBuffer_t* cbuf, void* output)
 }
 
 
+/**
+ * \brief Attempts to safely read one item from given circular buffer,
+ * waiting no longer than specified amount of time for mutex to be locked.
+ * \param mutex Mutex to lock on while reading from circular buffer.
+ * \param cbuf Circular buffer to read item from.
+ * \param output Output buffer for item to be saved into.
+ * \param timeoutMs Maximum amount of time to be spent waiting for mutex to unlock, in milliseconds.
+ * \return 0 if successful, 1 in case of timeout, negative value on error.
+*/
 static int readDataTimeout(mtx_t* mutex, CircularBuffer_t* cbuf, void* output, unsigned timeoutMs)
 {
 	const int mtxlockres = Mutex_tryLockMs(mutex, timeoutMs);
@@ -147,7 +156,7 @@ int AnalyzerThread(void* rawParams)
 
 				if (thrd_success == Mutex_tryLockMs(params->outputMutex, MUTEX_WAIT_TIME_MS))
 				{
-					CircularBuffer_write(params->outputBuffer, usageInfoBuffer);
+					*params->outputBuffer = *usageInfoBuffer;
 					Mutex_unlock(params->outputMutex);
 					Log(LLEVEL_DEBUG, "analyzer: usage stats sent");
 				}
