@@ -92,11 +92,11 @@ void Thread_forceSleepMs(unsigned milliseconds)
 
 		if (-1 == result)
 		{
-			LogWarning("thread sleep interrupted");
+			Log(LLEVEL_WARNING, "thread sleep interrupted");
 		}
 		else
 		{
-			LogError("error encountered while attempting to sleep");
+			Log(LLEVEL_ERROR, "error encountered while attempting to sleep");
 		}
 
 	} while (0 != result);

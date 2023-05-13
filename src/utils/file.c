@@ -8,19 +8,19 @@ int File_readContentInto(const char* fileName, char* bufPtr, size_t bufSz)
 {
 	if (NULL == fileName)
 	{
-		LogError("invalid argument provided: fileName");
+		Log(LLEVEL_ERROR, "invalid argument provided: fileName");
 		return -1;
 	}
 
 	if (NULL == bufPtr)
 	{
-		LogError("invalid argument provided: bufPtr");
+		Log(LLEVEL_ERROR, "invalid argument provided: bufPtr");
 		return -1;
 	}
 
 	if (bufSz < 1)
 	{
-		LogError("invalid argument provided: bufSz");
+		Log(LLEVEL_ERROR, "invalid argument provided: bufSz");
 		return -1;
 	}
 
@@ -28,7 +28,7 @@ int File_readContentInto(const char* fileName, char* bufPtr, size_t bufSz)
 
 	if (NULL == fp)
 	{
-		LogError("cannot open file: %s", fileName);
+		Log(LLEVEL_ERROR, "cannot open file: %s", fileName);
 		return -2;
 	}
 
@@ -41,11 +41,11 @@ int File_readContentInto(const char* fileName, char* bufPtr, size_t bufSz)
 	{
 		if (0 != ferror(fp))
 		{
-			LogError("an error has been encountered while attempting to read from file: %s", fileName);
+			Log(LLEVEL_ERROR, "an error has been encountered while attempting to read from file: %s", fileName);
 
 			if (EOF == fclose(fp))
 			{
-				LogError("an error has been encountered while attempting to close file: %s", fileName);
+				Log(LLEVEL_ERROR, "an error has been encountered while attempting to close file: %s", fileName);
 				return -4;
 			}
 
@@ -53,7 +53,7 @@ int File_readContentInto(const char* fileName, char* bufPtr, size_t bufSz)
 		}
 		else
 		{
-			LogWarning("file is too large for provided buffer: %s", fileName);
+			Log(LLEVEL_WARNING, "file is too large for provided buffer: %s", fileName);
 		}
 	}
 
@@ -62,7 +62,7 @@ int File_readContentInto(const char* fileName, char* bufPtr, size_t bufSz)
 
 	if (EOF == fclose(fp))
 	{
-		LogError("an error has been encountered while attempting to close file: %s", fileName);
+		Log(LLEVEL_ERROR, "an error has been encountered while attempting to close file: %s", fileName);
 		return -4;
 	}
 

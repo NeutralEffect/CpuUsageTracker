@@ -1,6 +1,7 @@
 #include "procstat.h"
 #include "log.h"
 #include "file.h"
+#include "cpucount.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -10,18 +11,6 @@
 #define MAX_FILE_LINE_COUNT 2048u
 #define MAX_EXPECTED_PROCSTAT_LENGTH 16384u
 #define FILE_PATH "/proc/stat"
-
-
-/**
- * \brief Retrieves amount of available logical processors in the system.
- * \warning This function will always return the same value,
- * even if amount of available processors changes during program's runtime.
- * \return Amount of available processors.
-*/
-static inline int getCpuCount(void)
-{
-	return get_nprocs();
-}
 
 
 /**
@@ -59,7 +48,7 @@ static ProcStat_t* parse(char* mutableFileContent)
 	 * we can safely take only those first lines from it and ignore others.
 	 * Adding one to account for total "cpu" line.
 	 */
-	const int significantLinesCount = getCpuCount() + 1;
+	const int significantLinesCount = CpuCount_get() + 1;
 
 	// Scan "cpu(N)" lines into structure
 	for (int ii = 0; ii < significantLinesCount; ++ii)
@@ -86,7 +75,7 @@ static ProcStat_t* parse(char* mutableFileContent)
 ProcStat_t* ProcStat_create(void)
 {
 	// Add one to account for total "cpu" line
-	const size_t size = ProcStat_getSize();
+	const size_t size = ProcStat_size();
 	ProcStat_t* result = malloc(size);
 
 	if (NULL == result)
@@ -99,7 +88,7 @@ ProcStat_t* ProcStat_create(void)
 	// but the overhead of function call is likely higher than that of overwriting a few more bytes.
 	memset(result, 0, size);
 	// Save CPU count.
-	result->cpuStatsLength = getCpuCount() + 1;
+	result->cpuStatsLength = CpuCount_get() + 1;
 	return result;
 }
 
@@ -115,9 +104,9 @@ void ProcStat_destroy(ProcStat_t* self)
 }
 
 
-size_t ProcStat_getSize(void)
+size_t ProcStat_size(void)
 {
-	size_t size = sizeof(ProcStat_t) + (getCpuCount() + 1) * sizeof(CpuStat_t);
+	size_t size = sizeof(ProcStat_t) + (CpuCount_get() + 1) * sizeof(CpuStat_t);
 	return size;
 }
 
@@ -141,7 +130,7 @@ ProcStat_t* ProcStat_parse(const char* fileContent)
 {
 	if (NULL == fileContent)
 	{
-		LogError("invalid argument provided: fileContent");
+		Log(LLEVEL_ERROR, "invalid argument provided: fileContent");
 		return NULL;
 	}
 
@@ -152,7 +141,7 @@ ProcStat_t* ProcStat_parse(const char* fileContent)
 
 	if (NULL == copy)
 	{
-		LogError("cannot allocate memory for content buffer");
+		Log(LLEVEL_ERROR, "cannot allocate memory for content buffer");
 		return NULL;
 	}
 

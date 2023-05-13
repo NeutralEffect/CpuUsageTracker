@@ -25,7 +25,7 @@ void ProcStat_destroy(ProcStat_t* self);
  * \brief Retrieve size of struct ProcStat on this system.
  * \return Size of struct ProcStat in bytes.
 */
-size_t ProcStat_getSize(void);
+size_t ProcStat_size(void);
 
 
 /**
@@ -58,14 +58,18 @@ typedef enum CpuStatIndex
 	CSINDEX_SOFTIRQ,
 	CSINDEX_STEAL,
 	CSINDEX_GUEST,
-	CSINDEX_GUESTNICE
+	CSINDEX_GUESTNICE,
+	CSINDEX_COUNT_
 }
 CpuStatIndex_t;
 
 
+typedef unsigned long long CpuStatValue_t;
+
+
 typedef struct CpuStat
 {
-	unsigned long long values[10];
+	CpuStatValue_t values[CSINDEX_COUNT_];
 }
 CpuStat_t;
 
