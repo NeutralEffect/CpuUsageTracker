@@ -195,7 +195,7 @@ int AnalyzerThread(void* rawParams)
 
 			case 1:
 			{
-				Log(LLEVEL_WARNING, "analyzer: procstat data unavailable");
+				Log(LLEVEL_INFO, "analyzer: procstat data unavailable");
 			}
 			break;
 
