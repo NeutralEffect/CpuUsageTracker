@@ -1,13 +1,13 @@
 #ifndef PRINTER_H_INCLUDED
 #define PRINTER_H_INCLUDED
 #include <threads.h>
-#include "circbuf.h"
+#include "cpuusage.h"
 
 
 typedef struct PrinterThreadParams
 {
 	mtx_t* mutex;
-	CircularBuffer_t* buffer;
+	CpuUsageInfo_t* buffer;
 }
 PrinterThreadParams_t;
 
