@@ -4,6 +4,7 @@
 #include "stdlib.h"
 #include "cpuusage.h"
 #include "log.h"
+#include <string.h>
 #include <threads.h>
 
 
@@ -156,7 +157,7 @@ int AnalyzerThread(void* rawParams)
 
 				if (thrd_success == Mutex_tryLockMs(params->outputMutex, MUTEX_WAIT_TIME_MS))
 				{
-					*params->outputBuffer = *usageInfoBuffer;
+					memcpy(params->outputBuffer, usageInfoBuffer, CpuUsageInfo_size());
 					Mutex_unlock(params->outputMutex);
 					Log(LLEVEL_DEBUG, "analyzer: usage stats sent");
 				}
