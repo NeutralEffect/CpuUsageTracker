@@ -2,6 +2,7 @@
 #define ANALYZER_H_INCLUDED
 #include <threads.h>
 #include "circbuf.h"
+#include "cpuusage.h"
 
 
 typedef struct AnalyzerThreadParams

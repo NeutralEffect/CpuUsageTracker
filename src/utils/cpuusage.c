@@ -41,7 +41,8 @@ static PercentageValue_t calculateCpuUsagePercentage(const CpuStat_t* oldStat, c
 	CpuStatValue_t idled = idle - prevIdle;
 
 	PercentageValue_t result = ((float) totald - idled) / totald;
-	return result;
+	// Adjust from fraction to percentage
+	return result * 100.0;
 }
 
 
@@ -62,9 +63,11 @@ void CpuUsageInfo_calculate(const ProcStat_t* oldProcStat, const ProcStat_t* new
 		return;
 	}
 
-	output->valuesLength = CpuCount_get() + 1;
 
-	for (unsigned ii = 0; ii < output->valuesLength; ++ii)
+	const size_t cpuLineCount = oldProcStat->cpuStatsLength;
+	output->valuesLength = cpuLineCount;
+
+	for (unsigned ii = 0; ii < cpuLineCount; ++ii)
 	{
 		output->values[ii] = calculateCpuUsagePercentage(&oldProcStat->cpuStats[ii], &newProcStat->cpuStats[ii]);
 	}
