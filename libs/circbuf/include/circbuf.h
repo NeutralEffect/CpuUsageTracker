@@ -25,6 +25,14 @@ void CircularBuffer_clear(CircularBuffer_t* self);
 
 
 /**
+ * \brief Safely remove given circular buffer releasing all of it's resources
+ * and deallocating memory used.
+ * \param self Circular buffer to be destroyed.
+*/
+void CircularBuffer_destroy(CircularBuffer_t* self);
+
+
+/**
  * \brief Get maximum item capacity of given circular buffer.
  * \param self Circular buffer in question.
  * \return Maximum capacity of given buffer.
