@@ -6,8 +6,10 @@ target_include_directories(${PROJECT_NAME}
 target_sources(${PROJECT_NAME}
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/threads/analyzer.c
+		${CMAKE_CURRENT_SOURCE_DIR}/threads/logger.c
 		${CMAKE_CURRENT_SOURCE_DIR}/threads/printer.c
 		${CMAKE_CURRENT_SOURCE_DIR}/threads/reader.c
+		${CMAKE_CURRENT_SOURCE_DIR}/threads/watchdog.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/cpucount.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/cpuusage.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/file.c

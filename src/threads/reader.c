@@ -4,9 +4,10 @@
 #include "procstat.h"
 #include "thread_utils.h"
 #include "log.h"
+#include "watchdog.h"
 
 
-#define SLEEP_TIME_SECONDS 1
+#define SLEEP_TIME_MILLISECONDS 500
 #define MUTEX_WAIT_TIME_MS 50
 
 
@@ -22,6 +23,8 @@ int ReaderThread(void* rawParams)
 	// Only continue execution if kill switch hasn't been activated
 	while (false == Thread_getKillSwitchStatus())
 	{
+		Watchdog_reportActive(TID_READER);
+
 		// Load procstat from file
 		ProcStat_t* procStat = ProcStat_loadFromFile();
 
@@ -63,7 +66,7 @@ int ReaderThread(void* rawParams)
 		}
 
 		// Wait for next iteration
-		Thread_sleep(SLEEP_TIME_SECONDS);
+		Thread_sleepMs(SLEEP_TIME_MILLISECONDS);
 	}
 
 	// Exit as usual

@@ -4,6 +4,7 @@
 #include "stdlib.h"
 #include "cpuusage.h"
 #include "log.h"
+#include "watchdog.h"
 #include <string.h>
 #include <threads.h>
 
@@ -129,7 +130,9 @@ int AnalyzerThread(void* rawParams)
 	while (
 		(0 != waitForData(params->inputMutex, params->inputBuffer, oldStatBuffer)) &&
 		(false == Thread_getKillSwitchStatus()))
-		;
+	{
+		Watchdog_reportActive(TID_ANALYZER);
+	}
 
 	Log(LLEVEL_DEBUG, "analyzer: procstat data received");
 	Log(LLEVEL_TRACE, "analyzer: cpu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
@@ -147,6 +150,8 @@ int AnalyzerThread(void* rawParams)
 	// Main loop
 	while (false == Thread_getKillSwitchStatus())
 	{
+		Watchdog_reportActive(TID_ANALYZER);
+
 		const int dataReadStatus = readDataTimeout(params->inputMutex, params->inputBuffer, newStatBuffer, MUTEX_WAIT_TIME_MS);
 
 		switch (dataReadStatus)

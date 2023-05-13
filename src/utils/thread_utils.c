@@ -21,18 +21,6 @@ static struct timespec durationMsToTimespecPoint(unsigned ms)
 }
 
 
-bool Thread_getKillSwitchStatus(void)
-{
-	return killSwitch;
-}
-
-
-void Thread_activateKillSwitch()
-{
-	killSwitch = true;
-}
-
-
 int Mutex_tryLock(mtx_t* mutex, unsigned waitTimeS)
 {
 	return Mutex_tryLockMs(mutex, waitTimeS * 1000u);
@@ -58,17 +46,15 @@ int Mutex_unlock(mtx_t* mutex)
 }
 
 
-int Thread_sleep(unsigned seconds)
+void Thread_activateKillSwitch()
 {
-	return thrd_sleep(&(struct timespec) { .tv_sec = seconds, .tv_nsec = 0 }, NULL);
+	killSwitch = true;
 }
 
 
-int Thread_sleepMs(unsigned milliseconds)
+bool Thread_getKillSwitchStatus(void)
 {
-	time_t secs = milliseconds / 1000u;
-	unsigned long long nsecs = (milliseconds - (secs * 1000)) * 1000000;
-	return thrd_sleep(&(struct timespec) { .tv_sec = secs, .tv_nsec = nsecs }, NULL);
+	return killSwitch;
 }
 
 
@@ -101,4 +87,18 @@ void Thread_forceSleepMs(unsigned milliseconds)
 
 	} while (0 != result);
 	
+}
+
+
+int Thread_sleep(unsigned seconds)
+{
+	return thrd_sleep(&(struct timespec) { .tv_sec = seconds, .tv_nsec = 0 }, NULL);
+}
+
+
+int Thread_sleepMs(unsigned milliseconds)
+{
+	time_t secs = milliseconds / 1000u;
+	unsigned long long nsecs = (milliseconds - (secs * 1000)) * 1000000;
+	return thrd_sleep(&(struct timespec) { .tv_sec = secs, .tv_nsec = nsecs }, NULL);
 }

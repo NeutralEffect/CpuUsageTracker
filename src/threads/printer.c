@@ -2,13 +2,13 @@
 #include "thread_utils.h"
 #include "cpuusage.h"
 #include "log.h"
+#include "watchdog.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 
 #define SLEEP_TIME_SECONDS 1
-#define SLEEP_TIME_MILLISECONDS (SLEEP_TIME_SECONDS * 1000)
 #define MUTEX_WAIT_TIME_MS 50
 #define PERCENTAGE_VALUE_FORMAT "%.2f"
 
@@ -53,6 +53,8 @@ int PrinterThread(void* rawParams)
 
 	while (false == Thread_getKillSwitchStatus())
 	{
+		Watchdog_reportActive(TID_PRINTER);
+
 		int mtxstatus = Mutex_tryLockMs(params->mutex, MUTEX_WAIT_TIME_MS);
 
 		switch (mtxstatus)

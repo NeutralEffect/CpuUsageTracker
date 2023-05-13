@@ -5,19 +5,6 @@
 
 
 /**
- * \brief Atomically get current kill switch status.
- * \return Kill switch status.
-*/
-bool Thread_getKillSwitchStatus(void);
-
-
-/**
- * \brief Activate kill switch, atomically setting it's value.
-*/
-void Thread_activateKillSwitch();
-
-
-/**
  * \brief Attempts to lock mutex either until successful or specified amount of time has passed.
  * \param mutex Mutex to be locked.
  * \param waitTimeS Maximum amount of time to wait for mutex to be locked, in seconds.
@@ -50,19 +37,9 @@ int Mutex_unlock(mtx_t* mutex);
 
 
 /**
- * \brief Blocks the execution of the current for at least specified amount of time.
- * \param seconds Amount of time for thread to be blocked for, in seconds.
- * \return 0 if successful, -1 in case of interrupt, other negative value in case of error.
+ * \brief Activate kill switch, atomically setting it's value.
 */
-int Thread_sleep(unsigned seconds);
-
-
-/**
- * \brief As Thread_sleep, but measuring duration in milliseconds.
- * \param seconds Amount of time for thread to be blocked for, in milliseconds.
- * \return As Thread_sleep.
-*/
-int Thread_sleepMs(unsigned milliseconds);
+void Thread_activateKillSwitch();
 
 
 /**
@@ -78,6 +55,29 @@ void Thread_forceSleep(unsigned seconds);
  * \param seconds Amount of time for thread to be blocked for, in milliseconds.
 */
 void Thread_forceSleepMs(unsigned milliseconds);
+
+
+/**
+ * \brief Atomically get current kill switch status.
+ * \return Kill switch status.
+*/
+bool Thread_getKillSwitchStatus(void);
+
+
+/**
+ * \brief Blocks the execution of the current for at least specified amount of time.
+ * \param seconds Amount of time for thread to be blocked for, in seconds.
+ * \return 0 if successful, -1 in case of interrupt, other negative value in case of error.
+*/
+int Thread_sleep(unsigned seconds);
+
+
+/**
+ * \brief As Thread_sleep, but measuring duration in milliseconds.
+ * \param seconds Amount of time for thread to be blocked for, in milliseconds.
+ * \return As Thread_sleep.
+*/
+int Thread_sleepMs(unsigned milliseconds);
 
 
 #endif // !THREAD_UTILS_H_INCLUDED

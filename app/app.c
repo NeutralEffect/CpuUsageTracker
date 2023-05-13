@@ -8,6 +8,8 @@
 #include "reader.h"
 #include "analyzer.h"
 #include "printer.h"
+#include "watchdog.h"
+#include "logger.h"
 #include "cpuusage.h"
 #include "procstat.h"
 #include "cpucount.h"
@@ -20,6 +22,7 @@ int main()
 	RegisterSigintHandler();
 	RegisterSigtermHandler();
 	CpuCount_init();
+	Watchdog_init();
 	SetLogLevel(LLEVEL_ERROR);
 
 	mtx_t procStatMtx;
@@ -29,9 +32,15 @@ int main()
 	CircularBuffer_t* procStatCbuf = CircularBuffer_create(ProcStat_size(), 10u);
 	CpuUsageInfo_t* usageInfoBuffer = malloc(CpuUsageInfo_size());
 
+	thrd_t watchdogThrd;
+	thrd_t loggerThrd;
 	thrd_t readerThrd;
 	thrd_t analyzerThrd;
 	thrd_t printerThrd;
+
+	thrd_create(&watchdogThrd, WatchdogThread, NULL);
+
+	thrd_create(&loggerThrd, LoggerThread, NULL);
 
 	ReaderThreadParams_t readerThrdParams = 
 	{
@@ -56,13 +65,19 @@ int main()
 	};
 	thrd_create(&printerThrd, PrinterThread, &printerThrdParams);
 
+	int watchdogResult;
+	int loggerResult;
 	int readerResult;
 	int analyzerResult;
 	int printerResult;
+	thrd_join(watchdogThrd, &watchdogResult);
+	thrd_join(loggerThrd, &loggerResult);
 	thrd_join(readerThrd, &readerResult);
 	thrd_join(analyzerThrd, &analyzerResult);
 	thrd_join(printerThrd, &printerResult);
 
 	free(usageInfoBuffer);
 	CircularBuffer_destroy(procStatCbuf);
+	
+	return 0;
 }
