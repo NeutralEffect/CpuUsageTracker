@@ -6,12 +6,15 @@
 
 /**
  * \brief Calculates CPU usage percentage. Formula taken from https://stackoverflow.com/a/23376195.
+ * \param oldStat Processor state time unit measurement taken at the start of measurement period. 
+ * \param newStat Processor state time unit measurement taken at the end of measurement period.
+ * \return Processor usage as percentage value in 0-100 range.
 */
 static PercentageValue_t calculateCpuUsagePercentage(const CpuStat_t* oldStat, const CpuStat_t* newStat)
 {
 	if ((NULL == oldStat) || (NULL == newStat))
 	{
-		return 200;
+		return 0;
 	}
 
 	CpuStatValue_t prevIdle = oldStat->values[CSINDEX_IDLE] + oldStat->values[CSINDEX_IOWAIT];

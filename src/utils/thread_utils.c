@@ -7,6 +7,11 @@
 static volatile atomic_bool g_killSwitch = false;
 
 
+/**
+ * \brief Converts duration in milliseconds into time point relative to current time.
+ * \param ms Milliseconds to convert.
+ * \return Time point when given amount of milliseconds from now on will pass.
+*/
 static struct timespec durationMsToTimespecPoint(unsigned ms)
 {
 	struct timespec timePoint;

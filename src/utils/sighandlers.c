@@ -6,6 +6,10 @@
 #include <stdio.h>
 
 
+/**
+ * \brief Signal handler for SIGINT. Requests immediate program termination.
+ * \param signum Ignored.
+*/
 static void sigintHandler(int signum)
 {
 	(void) signum;
@@ -13,6 +17,10 @@ static void sigintHandler(int signum)
 }
 
 
+/**
+ * \brief Signal handler for SIGTERM. Requests immediate program termination.
+ * \param signum Ignored.
+*/
 static void sigtermHandler(int signum)
 {
 	(void) signum;
@@ -20,6 +28,11 @@ static void sigtermHandler(int signum)
 }
 
 
+/**
+ * \brief Registers handler function for various signals.
+ * \param signum Signal to associate the handler with, eg. SIGINT.
+ * \param handler Handler funtion to be invoked when given signal is received.
+*/
 static void registerHandler(int signum, void (*handler)(int))
 {
 	struct sigaction action;
