@@ -12,7 +12,7 @@ static struct timespec durationMsToTimespecPoint(unsigned ms)
 	struct timespec timePoint;
 	timespec_get(&timePoint, TIME_UTC);
 	unsigned long long seconds = ms / 1000;
-	// Can be replaced with formula: (ms % 1000) * 1000
+	// Can be replaced with formula: (ms % 1000) * 1000000
 	unsigned long long nanoseconds = (ms - (seconds * 1000)) * 1000000;
 	timePoint.tv_sec += seconds;
 	timePoint.tv_nsec += nanoseconds;

@@ -1,3 +1,8 @@
+# Directories
 .vscode
+bin
 build
 out
+
+# Files
+Doxyfile.txt
