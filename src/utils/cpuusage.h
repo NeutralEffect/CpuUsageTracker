@@ -1,3 +1,8 @@
+/**
+ * \file cpuusage.h
+ * Functions and data types used for processing raw /proc/stat data into
+ * readable percentage values.
+*/
 #ifndef CPUUSAGE_H_INCLUDED
 #define CPUUSAGE_H_INCLUDED
 #include <stddef.h>

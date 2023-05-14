@@ -1,3 +1,7 @@
+/**
+ * \file cpucount.h
+ * Accessor functions for CPU count read-only variable used throughout the program.
+*/
 #ifndef CPUCOUNT_H_INCLUDED
 #define CPUCOUNT_H_INCLUDED
 

@@ -1,3 +1,7 @@
+/**
+ * \file logger.h
+ * Logger thread and logging interface.
+*/
 #ifndef LOGGER_H_INCLUDED
 #define LOGGER_H_INCLUDED
 #include <threads.h>

@@ -1,0 +1,170 @@
+\hypertarget{procstat_8h}{}\doxysection{src/utils/procstat.h File Reference}
+\label{procstat_8h}\index{src/utils/procstat.h@{src/utils/procstat.h}}
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+Include dependency graph for procstat.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structCpuStat}{Cpu\+Stat}}
+\item 
+struct \mbox{\hyperlink{structProcStat}{Proc\+Stat}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{procstat_8h_af6d95f7a296d12967bb4d6cfa0dad4d3}\label{procstat_8h_af6d95f7a296d12967bb4d6cfa0dad4d3}} 
+typedef struct \mbox{\hyperlink{structProcStat}{Proc\+Stat}} {\bfseries Proc\+Stat\+\_\+t}
+\item 
+typedef enum \mbox{\hyperlink{procstat_8h_a144a1efb42302b58839d1eba8ed3c58c}{Cpu\+Stat\+Index}} \mbox{\hyperlink{procstat_8h_a05aefe336543501a26bce0913e8301ca}{Cpu\+Stat\+Index\+\_\+t}}
+\item 
+\mbox{\Hypertarget{procstat_8h_a07542fbf8c9c21f312a651c4987c74f5}\label{procstat_8h_a07542fbf8c9c21f312a651c4987c74f5}} 
+typedef unsigned long long {\bfseries Cpu\+Stat\+Value\+\_\+t}
+\item 
+typedef struct \mbox{\hyperlink{structCpuStat}{Cpu\+Stat}} \mbox{\hyperlink{procstat_8h_aa872553cd60d671f0284c027054610d4}{Cpu\+Stat\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{procstat_8h_a144a1efb42302b58839d1eba8ed3c58c}{Cpu\+Stat\+Index}} \{ \newline
+{\bfseries CSINDEX\+\_\+\+USER} = 0
+, {\bfseries CSINDEX\+\_\+\+NICE}
+, {\bfseries CSINDEX\+\_\+\+SYSTEM}
+, {\bfseries CSINDEX\+\_\+\+IDLE}
+, \newline
+{\bfseries CSINDEX\+\_\+\+IOWAIT}
+, {\bfseries CSINDEX\+\_\+\+IRQ}
+, {\bfseries CSINDEX\+\_\+\+SOFTIRQ}
+, {\bfseries CSINDEX\+\_\+\+STEAL}
+, \newline
+{\bfseries CSINDEX\+\_\+\+GUEST}
+, {\bfseries CSINDEX\+\_\+\+GUESTNICE}
+, {\bfseries CSINDEX\+\_\+\+COUNT\+\_\+}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}} $\ast$ \mbox{\hyperlink{procstat_8h_a959a6d9de0ef89188f000c0dc11779eb}{Proc\+Stat\+\_\+create}} (void)
+\begin{DoxyCompactList}\small\item\em Create new, blank \mbox{\hyperlink{structProcStat}{Proc\+Stat}} structure with enough capacity to hold information about this system\textquotesingle{}s CPUs. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{procstat_8h_a7e518f9a9095610d1eac3a56f0919899}{Proc\+Stat\+\_\+destroy}} (\mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}} $\ast$self)
+\begin{DoxyCompactList}\small\item\em Destroy \mbox{\hyperlink{structProcStat}{Proc\+Stat}} structure deallocating memory and cleaning up any resources used. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{procstat_8h_acca10a828ce3ec3d719237121823c936}{Proc\+Stat\+\_\+size}} (void)
+\begin{DoxyCompactList}\small\item\em Retrieve size of struct \mbox{\hyperlink{structProcStat}{Proc\+Stat}} on this system. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}} $\ast$ \mbox{\hyperlink{procstat_8h_a3e759e25360954b5ec56738688f58053}{Proc\+Stat\+\_\+load\+From\+File}} (void)
+\begin{DoxyCompactList}\small\item\em Reads /proc/stat file and parses it\textquotesingle{}s content into specialized structure. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}} $\ast$ \mbox{\hyperlink{procstat_8h_ad425473d2f4f5c247b02f7cc8f5d008c}{Proc\+Stat\+\_\+parse}} (const char $\ast$file\+Content)
+\begin{DoxyCompactList}\small\item\em Parses contents of /proc/stat file into specialized structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Data types and functions used to access /proc/stat file and convert it\textquotesingle{}s contents into program-\/usable format. 
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{procstat_8h_aa872553cd60d671f0284c027054610d4}\label{procstat_8h_aa872553cd60d671f0284c027054610d4}} 
+\index{procstat.h@{procstat.h}!CpuStat\_t@{CpuStat\_t}}
+\index{CpuStat\_t@{CpuStat\_t}!procstat.h@{procstat.h}}
+\doxysubsubsection{\texorpdfstring{CpuStat\_t}{CpuStat\_t}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{structCpuStat}{Cpu\+Stat}} \mbox{\hyperlink{procstat_8h_aa872553cd60d671f0284c027054610d4}{Cpu\+Stat\+\_\+t}}}
+
+Representation of single \char`\"{}cpu(\+N)\char`\"{} line from /proc/stat file. \mbox{\Hypertarget{procstat_8h_a05aefe336543501a26bce0913e8301ca}\label{procstat_8h_a05aefe336543501a26bce0913e8301ca}} 
+\index{procstat.h@{procstat.h}!CpuStatIndex\_t@{CpuStatIndex\_t}}
+\index{CpuStatIndex\_t@{CpuStatIndex\_t}!procstat.h@{procstat.h}}
+\doxysubsubsection{\texorpdfstring{CpuStatIndex\_t}{CpuStatIndex\_t}}
+{\footnotesize\ttfamily typedef enum \mbox{\hyperlink{procstat_8h_a144a1efb42302b58839d1eba8ed3c58c}{Cpu\+Stat\+Index}} \mbox{\hyperlink{procstat_8h_a05aefe336543501a26bce0913e8301ca}{Cpu\+Stat\+Index\+\_\+t}}}
+
+Indices of values corresponding to columns in \char`\"{}cpu(\+N)\char`\"{} lines of /proc/stat file. Represents processor states. 
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{procstat_8h_a144a1efb42302b58839d1eba8ed3c58c}\label{procstat_8h_a144a1efb42302b58839d1eba8ed3c58c}} 
+\index{procstat.h@{procstat.h}!CpuStatIndex@{CpuStatIndex}}
+\index{CpuStatIndex@{CpuStatIndex}!procstat.h@{procstat.h}}
+\doxysubsubsection{\texorpdfstring{CpuStatIndex}{CpuStatIndex}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{procstat_8h_a144a1efb42302b58839d1eba8ed3c58c}{Cpu\+Stat\+Index}}}
+
+Indices of values corresponding to columns in \char`\"{}cpu(\+N)\char`\"{} lines of /proc/stat file. Represents processor states. 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{procstat_8h_a959a6d9de0ef89188f000c0dc11779eb}\label{procstat_8h_a959a6d9de0ef89188f000c0dc11779eb}} 
+\index{procstat.h@{procstat.h}!ProcStat\_create@{ProcStat\_create}}
+\index{ProcStat\_create@{ProcStat\_create}!procstat.h@{procstat.h}}
+\doxysubsubsection{\texorpdfstring{ProcStat\_create()}{ProcStat\_create()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}}$\ast$ Proc\+Stat\+\_\+create (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Create new, blank \mbox{\hyperlink{structProcStat}{Proc\+Stat}} structure with enough capacity to hold information about this system\textquotesingle{}s CPUs. 
+
+\begin{DoxyReturn}{Returns}
+Pointer to newly created \mbox{\hyperlink{structProcStat}{Proc\+Stat}} structure, or NULL in case of malloc failure. 
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+Resulting structure has to be manually deallocated by user once no longer needed. 
+\end{DoxyWarning}
+\mbox{\Hypertarget{procstat_8h_a7e518f9a9095610d1eac3a56f0919899}\label{procstat_8h_a7e518f9a9095610d1eac3a56f0919899}} 
+\index{procstat.h@{procstat.h}!ProcStat\_destroy@{ProcStat\_destroy}}
+\index{ProcStat\_destroy@{ProcStat\_destroy}!procstat.h@{procstat.h}}
+\doxysubsubsection{\texorpdfstring{ProcStat\_destroy()}{ProcStat\_destroy()}}
+{\footnotesize\ttfamily void Proc\+Stat\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}} $\ast$}]{self }\end{DoxyParamCaption})}
+
+
+
+Destroy \mbox{\hyperlink{structProcStat}{Proc\+Stat}} structure deallocating memory and cleaning up any resources used. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em self} & Pointer to Proc\+Stat\+\_\+t structure to be destroyed. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{procstat_8h_a3e759e25360954b5ec56738688f58053}\label{procstat_8h_a3e759e25360954b5ec56738688f58053}} 
+\index{procstat.h@{procstat.h}!ProcStat\_loadFromFile@{ProcStat\_loadFromFile}}
+\index{ProcStat\_loadFromFile@{ProcStat\_loadFromFile}!procstat.h@{procstat.h}}
+\doxysubsubsection{\texorpdfstring{ProcStat\_loadFromFile()}{ProcStat\_loadFromFile()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}}$\ast$ Proc\+Stat\+\_\+load\+From\+File (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Reads /proc/stat file and parses it\textquotesingle{}s content into specialized structure. 
+
+\begin{DoxyReturn}{Returns}
+Pointer to dynamically-\/allocated structure containing data extracted from file contents if successful, NULL in case of failure. 
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+The resulting structure has to be deallocated manually by the user. 
+\end{DoxyWarning}
+\mbox{\Hypertarget{procstat_8h_ad425473d2f4f5c247b02f7cc8f5d008c}\label{procstat_8h_ad425473d2f4f5c247b02f7cc8f5d008c}} 
+\index{procstat.h@{procstat.h}!ProcStat\_parse@{ProcStat\_parse}}
+\index{ProcStat\_parse@{ProcStat\_parse}!procstat.h@{procstat.h}}
+\doxysubsubsection{\texorpdfstring{ProcStat\_parse()}{ProcStat\_parse()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}}$\ast$ Proc\+Stat\+\_\+parse (\begin{DoxyParamCaption}\item[{const char $\ast$}]{file\+Content }\end{DoxyParamCaption})}
+
+
+
+Parses contents of /proc/stat file into specialized structure. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file\+Content} & Contents of /proc/stat file. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Pointer to dynamically-\/allocated structure containing data extracted from file contents if successful, NULL in case of failure. 
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+The resulting structure has to be deallocated manually by the user. 
+\end{DoxyWarning}
+\mbox{\Hypertarget{procstat_8h_acca10a828ce3ec3d719237121823c936}\label{procstat_8h_acca10a828ce3ec3d719237121823c936}} 
+\index{procstat.h@{procstat.h}!ProcStat\_size@{ProcStat\_size}}
+\index{ProcStat\_size@{ProcStat\_size}!procstat.h@{procstat.h}}
+\doxysubsubsection{\texorpdfstring{ProcStat\_size()}{ProcStat\_size()}}
+{\footnotesize\ttfamily size\+\_\+t Proc\+Stat\+\_\+size (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Retrieve size of struct \mbox{\hyperlink{structProcStat}{Proc\+Stat}} on this system. 
+
+\begin{DoxyReturn}{Returns}
+Size of struct \mbox{\hyperlink{structProcStat}{Proc\+Stat}} in bytes. 
+\end{DoxyReturn}

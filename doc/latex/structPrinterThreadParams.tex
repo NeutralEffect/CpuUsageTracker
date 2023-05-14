@@ -1,0 +1,40 @@
+\hypertarget{structPrinterThreadParams}{}\doxysection{Printer\+Thread\+Params Struct Reference}
+\label{structPrinterThreadParams}\index{PrinterThreadParams@{PrinterThreadParams}}
+
+
+{\ttfamily \#include $<$printer.\+h$>$}
+
+
+
+Collaboration diagram for Printer\+Thread\+Params\+:
+% FIG 0
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+mtx\+\_\+t $\ast$ \mbox{\hyperlink{structPrinterThreadParams_aa74d78d552795286b382d9b319cbaa2d}{mutex}}
+\item 
+\mbox{\hyperlink{cpuusage_8h_a7c39d410204790aa68f40847a3c0759b}{Cpu\+Usage\+Info\+\_\+t}} $\ast$ \mbox{\hyperlink{structPrinterThreadParams_a9a7077acb37f8dbdef62d187d2611e5b}{buffer}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Paramters required by \mbox{\hyperlink{printer_8h_a80252f43f39157e10f4f68456f30d473}{Printer\+Thread()}} function. 
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{structPrinterThreadParams_a9a7077acb37f8dbdef62d187d2611e5b}\label{structPrinterThreadParams_a9a7077acb37f8dbdef62d187d2611e5b}} 
+\index{PrinterThreadParams@{PrinterThreadParams}!buffer@{buffer}}
+\index{buffer@{buffer}!PrinterThreadParams@{PrinterThreadParams}}
+\doxysubsubsection{\texorpdfstring{buffer}{buffer}}
+{\footnotesize\ttfamily \mbox{\hyperlink{cpuusage_8h_a7c39d410204790aa68f40847a3c0759b}{Cpu\+Usage\+Info\+\_\+t}}$\ast$ Printer\+Thread\+Params\+::buffer}
+
+Input buffer to read CPU usage statistics from. Buffer should be shared with analyzer thread and hold either valid data or be zero-\/initialized. \mbox{\Hypertarget{structPrinterThreadParams_aa74d78d552795286b382d9b319cbaa2d}\label{structPrinterThreadParams_aa74d78d552795286b382d9b319cbaa2d}} 
+\index{PrinterThreadParams@{PrinterThreadParams}!mutex@{mutex}}
+\index{mutex@{mutex}!PrinterThreadParams@{PrinterThreadParams}}
+\doxysubsubsection{\texorpdfstring{mutex}{mutex}}
+{\footnotesize\ttfamily mtx\+\_\+t$\ast$ Printer\+Thread\+Params\+::mutex}
+
+Mutex to lock on while reading usage statistics from input buffer. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/threads/\mbox{\hyperlink{printer_8h}{printer.\+h}}\end{DoxyCompactItemize}

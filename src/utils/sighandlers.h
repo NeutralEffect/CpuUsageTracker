@@ -1,3 +1,7 @@
+/**
+ * \file sighandlers.h
+ * Signal handling and handler management.
+*/
 #ifndef SIGHANDLERS_H_INCLUDED
 #define SIGHANDLERS_H_INCLUDED
 

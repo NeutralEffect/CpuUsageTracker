@@ -1,3 +1,7 @@
+/**
+ * \file watchdog.h
+ * Watchdog thread interface, used also for activity reporting.
+*/
 #ifndef WATCHDOG_H_INCLUDED
 #define WATCHDOG_H_INCLUDED
 

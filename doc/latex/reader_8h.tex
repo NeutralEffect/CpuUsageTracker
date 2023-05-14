@@ -1,0 +1,51 @@
+\hypertarget{reader_8h}{}\doxysection{src/threads/reader.h File Reference}
+\label{reader_8h}\index{src/threads/reader.h@{src/threads/reader.h}}
+{\ttfamily \#include $<$threads.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}circbuf.\+h\char`\"{}}\newline
+Include dependency graph for reader.\+h\+:
+% FIG 0
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structReaderThreadParams}{Reader\+Thread\+Params}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{structReaderThreadParams}{Reader\+Thread\+Params}} \mbox{\hyperlink{reader_8h_ae8477c58e37f287509dbbb777a51ace2}{Reader\+Thread\+Params\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{reader_8h_a15987e92d89b687e94bcdf9940f245bf}{Reader\+Thread}} (void $\ast$params)
+\begin{DoxyCompactList}\small\item\em Thread function for reading /proc/stat file and parsing it\textquotesingle{}s content into Proc\+Stat\+\_\+t structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Reader thread interface. 
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{reader_8h_ae8477c58e37f287509dbbb777a51ace2}\label{reader_8h_ae8477c58e37f287509dbbb777a51ace2}} 
+\index{reader.h@{reader.h}!ReaderThreadParams\_t@{ReaderThreadParams\_t}}
+\index{ReaderThreadParams\_t@{ReaderThreadParams\_t}!reader.h@{reader.h}}
+\doxysubsubsection{\texorpdfstring{ReaderThreadParams\_t}{ReaderThreadParams\_t}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{structReaderThreadParams}{Reader\+Thread\+Params}} \mbox{\hyperlink{reader_8h_ae8477c58e37f287509dbbb777a51ace2}{Reader\+Thread\+Params\+\_\+t}}}
+
+Paramters required by \mbox{\hyperlink{reader_8h_a15987e92d89b687e94bcdf9940f245bf}{Reader\+Thread()}} function. 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{reader_8h_a15987e92d89b687e94bcdf9940f245bf}\label{reader_8h_a15987e92d89b687e94bcdf9940f245bf}} 
+\index{reader.h@{reader.h}!ReaderThread@{ReaderThread}}
+\index{ReaderThread@{ReaderThread}!reader.h@{reader.h}}
+\doxysubsubsection{\texorpdfstring{ReaderThread()}{ReaderThread()}}
+{\footnotesize\ttfamily int Reader\+Thread (\begin{DoxyParamCaption}\item[{void $\ast$}]{params }\end{DoxyParamCaption})}
+
+
+
+Thread function for reading /proc/stat file and parsing it\textquotesingle{}s content into Proc\+Stat\+\_\+t structure. 
+
+Thread will periodically read and parse /proc/stat file and write the result into circular buffer provided through params. Those writes will be only performed if provided mutex is available, as it will be locked for their entire duration. 
+\begin{DoxyParams}{Parameters}
+{\em params} & Pointer to valid Reader\+Thread\+Params\+\_\+t structure. \\
+\hline
+\end{DoxyParams}

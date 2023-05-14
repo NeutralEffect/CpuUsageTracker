@@ -1,3 +1,7 @@
+/**
+ * \file analyzer.h
+ * Analyzer thread interface.
+*/
 #ifndef ANALYZER_H_INCLUDED
 #define ANALYZER_H_INCLUDED
 #include <threads.h>

@@ -1,3 +1,7 @@
+/**
+ * \file file.h
+ * File system access.
+*/
 #ifndef FILE_H_INCLUDED
 #define FILE_H_INCLUDED
 #include <stddef.h>

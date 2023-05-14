@@ -1,0 +1,78 @@
+\hypertarget{cpuusage_8h}{}\doxysection{src/utils/cpuusage.h File Reference}
+\label{cpuusage_8h}\index{src/utils/cpuusage.h@{src/utils/cpuusage.h}}
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}procstat.\+h\char`\"{}}\newline
+Include dependency graph for cpuusage.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structCpuUsageInfo}{Cpu\+Usage\+Info}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{cpuusage_8h_a9475eb59c7648dc3f273008a02708c74}\label{cpuusage_8h_a9475eb59c7648dc3f273008a02708c74}} 
+typedef double {\bfseries Percentage\+Value\+\_\+t}
+\item 
+typedef struct \mbox{\hyperlink{structCpuUsageInfo}{Cpu\+Usage\+Info}} \mbox{\hyperlink{cpuusage_8h_a7c39d410204790aa68f40847a3c0759b}{Cpu\+Usage\+Info\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{cpuusage_8h_a438250608af8507492836560f6b42a7d}{Cpu\+Usage\+Info\+\_\+calculate}} (const \mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}} $\ast$old\+Proc\+Stat, const \mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}} $\ast$new\+Proc\+Stat, \mbox{\hyperlink{cpuusage_8h_a7c39d410204790aa68f40847a3c0759b}{Cpu\+Usage\+Info\+\_\+t}} $\ast$output)
+\begin{DoxyCompactList}\small\item\em Calculates usage statistics for every core using raw data retrieved at start and end of measurement period. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{cpuusage_8h_a7a2c1c4c163ee2b982de3e7c730cca59}{Cpu\+Usage\+Info\+\_\+size}} (void)
+\begin{DoxyCompactList}\small\item\em Retrieves expected size of Cpu\+Usage\+Info\+\_\+t structure in bytes. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Functions and data types used for processing raw /proc/stat data into readable percentage values. 
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{cpuusage_8h_a7c39d410204790aa68f40847a3c0759b}\label{cpuusage_8h_a7c39d410204790aa68f40847a3c0759b}} 
+\index{cpuusage.h@{cpuusage.h}!CpuUsageInfo\_t@{CpuUsageInfo\_t}}
+\index{CpuUsageInfo\_t@{CpuUsageInfo\_t}!cpuusage.h@{cpuusage.h}}
+\doxysubsubsection{\texorpdfstring{CpuUsageInfo\_t}{CpuUsageInfo\_t}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{structCpuUsageInfo}{Cpu\+Usage\+Info}} \mbox{\hyperlink{cpuusage_8h_a7c39d410204790aa68f40847a3c0759b}{Cpu\+Usage\+Info\+\_\+t}}}
+
+Structure containing CPU usage statistics for every core, as percentage. 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{cpuusage_8h_a438250608af8507492836560f6b42a7d}\label{cpuusage_8h_a438250608af8507492836560f6b42a7d}} 
+\index{cpuusage.h@{cpuusage.h}!CpuUsageInfo\_calculate@{CpuUsageInfo\_calculate}}
+\index{CpuUsageInfo\_calculate@{CpuUsageInfo\_calculate}!cpuusage.h@{cpuusage.h}}
+\doxysubsubsection{\texorpdfstring{CpuUsageInfo\_calculate()}{CpuUsageInfo\_calculate()}}
+{\footnotesize\ttfamily void Cpu\+Usage\+Info\+\_\+calculate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}} $\ast$}]{old\+Proc\+Stat,  }\item[{const \mbox{\hyperlink{structProcStat}{Proc\+Stat\+\_\+t}} $\ast$}]{new\+Proc\+Stat,  }\item[{\mbox{\hyperlink{cpuusage_8h_a7c39d410204790aa68f40847a3c0759b}{Cpu\+Usage\+Info\+\_\+t}} $\ast$}]{output }\end{DoxyParamCaption})}
+
+
+
+Calculates usage statistics for every core using raw data retrieved at start and end of measurement period. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em old\+Proc\+Stat} & Data from /proc/stat retrieved at start of measurement period. \\
+\hline
+{\em new\+Proc\+Stat} & Data from /proc/stat retrieved at start of measurement period. \\
+\hline
+{\em output} & Output buffer for calculated statistics. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{cpuusage_8h_a7a2c1c4c163ee2b982de3e7c730cca59}\label{cpuusage_8h_a7a2c1c4c163ee2b982de3e7c730cca59}} 
+\index{cpuusage.h@{cpuusage.h}!CpuUsageInfo\_size@{CpuUsageInfo\_size}}
+\index{CpuUsageInfo\_size@{CpuUsageInfo\_size}!cpuusage.h@{cpuusage.h}}
+\doxysubsubsection{\texorpdfstring{CpuUsageInfo\_size()}{CpuUsageInfo\_size()}}
+{\footnotesize\ttfamily size\+\_\+t Cpu\+Usage\+Info\+\_\+size (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Retrieves expected size of Cpu\+Usage\+Info\+\_\+t structure in bytes. 
+
+\begin{DoxyWarning}{Warning}
+Since this function uses \mbox{\hyperlink{cpucount_8h_aa74d59ff2e46a00c1f6fc3a63c1c6771}{Cpu\+Count\+\_\+get()}} internally, \mbox{\hyperlink{cpucount_8h_a765b0365b7f4fbedd1a6e54b19d4e73d}{Cpu\+Count\+\_\+init()}} should be called before using it. 
+\end{DoxyWarning}
+\begin{DoxyReturn}{Returns}
+Size of \mbox{\hyperlink{structCpuUsageInfo}{Cpu\+Usage\+Info}} structure, in bytes. 
+\end{DoxyReturn}

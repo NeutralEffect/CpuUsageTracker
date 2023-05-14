@@ -1,0 +1,40 @@
+\hypertarget{structProcStat}{}\doxysection{Proc\+Stat Struct Reference}
+\label{structProcStat}\index{ProcStat@{ProcStat}}
+
+
+{\ttfamily \#include $<$procstat.\+h$>$}
+
+
+
+Collaboration diagram for Proc\+Stat\+:
+% FIG 0
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{structProcStat_a2580249be08dddea066279a32e9a2268}{cpu\+Stats\+Length}}
+\item 
+\mbox{\hyperlink{procstat_8h_aa872553cd60d671f0284c027054610d4}{Cpu\+Stat\+\_\+t}} \mbox{\hyperlink{structProcStat_aea594e4247f115ff8d54207873b5ff3f}{cpu\+Stats}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Representation of data from /proc/stat file, used to hold data parsed from said file. 
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{structProcStat_aea594e4247f115ff8d54207873b5ff3f}\label{structProcStat_aea594e4247f115ff8d54207873b5ff3f}} 
+\index{ProcStat@{ProcStat}!cpuStats@{cpuStats}}
+\index{cpuStats@{cpuStats}!ProcStat@{ProcStat}}
+\doxysubsubsection{\texorpdfstring{cpuStats}{cpuStats}}
+{\footnotesize\ttfamily \mbox{\hyperlink{procstat_8h_aa872553cd60d671f0284c027054610d4}{Cpu\+Stat\+\_\+t}} Proc\+Stat\+::cpu\+Stats\mbox{[}$\,$\mbox{]}}
+
+Array of values corresponding to \char`\"{}cpu(\+N)\char`\"{} lines in /proc/stat file. \mbox{\Hypertarget{structProcStat_a2580249be08dddea066279a32e9a2268}\label{structProcStat_a2580249be08dddea066279a32e9a2268}} 
+\index{ProcStat@{ProcStat}!cpuStatsLength@{cpuStatsLength}}
+\index{cpuStatsLength@{cpuStatsLength}!ProcStat@{ProcStat}}
+\doxysubsubsection{\texorpdfstring{cpuStatsLength}{cpuStatsLength}}
+{\footnotesize\ttfamily size\+\_\+t Proc\+Stat\+::cpu\+Stats\+Length}
+
+CPU stats array length. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/utils/\mbox{\hyperlink{procstat_8h}{procstat.\+h}}\end{DoxyCompactItemize}

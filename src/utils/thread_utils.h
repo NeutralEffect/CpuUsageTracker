@@ -1,3 +1,7 @@
+/**
+ * \file thread_utils.h
+ * Thread synchronization, communication and management utilities.
+*/
 #ifndef THREAD_UTILS_H_INCLUDED
 #define THREAD_UTILS_H_INCLUDED
 #include <stdbool.h>

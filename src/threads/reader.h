@@ -1,3 +1,7 @@
+/**
+ * \file reader.h
+ * Reader thread interface.
+*/
 #ifndef READER_H_INCLUDED
 #define READER_H_INCLUDED
 #include <threads.h>

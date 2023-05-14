@@ -1,3 +1,8 @@
+/**
+ * \file procstat.h
+ * Data types and functions used to access /proc/stat file
+ * and convert it's contents into program-usable format.
+*/
 #ifndef PROCSTAT_H_INCLUDED
 #define PROCSTAT_H_INCLUDED
 #include <stddef.h>

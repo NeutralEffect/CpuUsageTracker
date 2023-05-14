@@ -1,3 +1,7 @@
+/**
+ * \file printer.h
+ * Printer thread interface.
+*/
 #ifndef PRINTER_H_INCLUDED
 #define PRINTER_H_INCLUDED
 #include <threads.h>

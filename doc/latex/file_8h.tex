@@ -1,0 +1,38 @@
+\hypertarget{file_8h}{}\doxysection{src/utils/file.h File Reference}
+\label{file_8h}\index{src/utils/file.h@{src/utils/file.h}}
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+Include dependency graph for file.\+h\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{file_8h_a86703e664a15a9eba26eac5cd2a6b867}{File\+\_\+read\+Content\+Into}} (const char $\ast$file\+Name, char $\ast$buf\+Ptr, size\+\_\+t buf\+Sz)
+\begin{DoxyCompactList}\small\item\em Read content of requested file into user-\/provided buffer. This fucntion appends null-\/terminator automatically, for which one byte of the buffer is reserved. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+File system access. 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{file_8h_a86703e664a15a9eba26eac5cd2a6b867}\label{file_8h_a86703e664a15a9eba26eac5cd2a6b867}} 
+\index{file.h@{file.h}!File\_readContentInto@{File\_readContentInto}}
+\index{File\_readContentInto@{File\_readContentInto}!file.h@{file.h}}
+\doxysubsubsection{\texorpdfstring{File\_readContentInto()}{File\_readContentInto()}}
+{\footnotesize\ttfamily int File\+\_\+read\+Content\+Into (\begin{DoxyParamCaption}\item[{const char $\ast$}]{file\+Name,  }\item[{char $\ast$}]{buf\+Ptr,  }\item[{size\+\_\+t}]{buf\+Sz }\end{DoxyParamCaption})}
+
+
+
+Read content of requested file into user-\/provided buffer. This fucntion appends null-\/terminator automatically, for which one byte of the buffer is reserved. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file\+Name} & Name of file to read. \\
+\hline
+{\em buf\+Ptr} & Pointer to buffer the file content will be read into. \\
+\hline
+{\em buf\+Sz} & Maximum size of provided buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+On success, amount of bytes read from file will be returned, or INT\+\_\+\+MAX if that amount is equal to or greater than INT\+\_\+\+MAX. Otherwise, a negative integer will be returned. 
+\end{DoxyReturn}
