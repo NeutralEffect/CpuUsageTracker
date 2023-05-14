@@ -27,6 +27,8 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 		-Weverything
 		-Werror
 		-Wno-declaration-after-statement
+		-Wno-unused-macros
+		-Wno-unused-function
 		-Wno-padded
 		-Wno-newline-eof
 		-Wno-error=pedantic
@@ -35,16 +37,19 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 		-Wno-sign-conversion
 		-Wno-cast-qual
 		-Wno-disabled-macro-expansion
+		-Wno-missing-prototypes
 		-Wno-error=implicit-int-float-conversion
 		-Wno-error=shorten-64-to-32
-		-pedantic)
+		-pedantic
+		-pthread)
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(FileTests PRIVATE
 		-Wall
 		-Wextra
 		-Wpedantic
 		-Werror
-		-Wno-error=pedantic)
+		-Wno-error=pedantic
+		-pthread)
 endif()
 
 
@@ -74,6 +79,8 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 		-Weverything
 		-Werror
 		-Wno-declaration-after-statement
+		-Wno-unused-macros
+		-Wno-unused-function
 		-Wno-padded
 		-Wno-newline-eof
 		-Wno-error=pedantic
@@ -82,14 +89,17 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 		-Wno-sign-conversion
 		-Wno-cast-qual
 		-Wno-disabled-macro-expansion
+		-Wno-missing-prototypes
 		-Wno-error=implicit-int-float-conversion
 		-Wno-error=shorten-64-to-32
-		-pedantic)
+		-pedantic
+		-pthread)
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(ThreadUtilsTests PRIVATE
 		-Wall
 		-Wextra
 		-Wpedantic
 		-Werror
-		-Wno-error=pedantic)
+		-Wno-error=pedantic
+		-pthread)
 endif()

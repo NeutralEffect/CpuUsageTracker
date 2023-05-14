@@ -31,6 +31,8 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 	target_compile_options(${PROJECT_NAME} PRIVATE
 		-Weverything
 		-Werror
+		-Wno-unused-macros
+		-Wno-unused-function
 		-Wno-declaration-after-statement
 		-Wno-padded
 		-Wno-newline-eof
@@ -40,8 +42,10 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 		-Wno-sign-conversion
 		-Wno-cast-qual
 		-Wno-disabled-macro-expansion
+		-Wno-missing-prototypes
 		-Wno-error=implicit-int-float-conversion
 		-Wno-error=shorten-64-to-32
+		-pthread
 		-pedantic)
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(${PROJECT_NAME} PRIVATE
@@ -49,5 +53,6 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 		-Wextra
 		-Wpedantic
 		-Werror
-		-Wno-error=pedantic)
+		-Wno-error=pedantic
+		-pthread)
 endif()
