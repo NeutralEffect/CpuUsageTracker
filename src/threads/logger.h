@@ -50,14 +50,6 @@ void Logger_setLogLevel(LogLevel_t newLogLevel);
 #define LogFileLine() do { Log(LLEVEL_DEBUG, "%s:%i", __FILE__, __LINE__); } while (0)
 
 
-typedef struct LoggerThreadParams
-{
-	mtx_t* mutex;
-	CircularBuffer_t* messageBuffer;
-}
-LoggerThreadParams_t;
-
-
 int LoggerThread(void* params);
 
 
