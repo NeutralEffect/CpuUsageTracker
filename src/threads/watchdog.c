@@ -12,8 +12,8 @@
 #define MUTEX_WAIT_TIME_MS 50u
 
 
-static volatile struct timespec activityReports[TID_COUNT_];
-static mtx_t activityReportsMutex;
+static volatile struct timespec g_activityReports[TID_COUNT_];
+static mtx_t g_activityReportsMutex;
 
 
 static struct timespec timespecDifference(struct timespec a, struct timespec b)
@@ -50,7 +50,7 @@ static void triggerKillswitch(void)
 
 void Watchdog_init(void)
 {
-	if (thrd_success != mtx_init(&activityReportsMutex, mtx_timed))
+	if (thrd_success != mtx_init(&g_activityReportsMutex, mtx_timed))
 	{
 		// Highly unlikely for this error to arise
 		Log(LLEVEL_FATAL, "cannot create mutex for watchdog module");
@@ -62,14 +62,14 @@ void Watchdog_reportActive(ThreadId_t threadIndex)
 {
 	static const unsigned MAX_LOCK_TIME_MS = 50u;
 
-	if (thrd_success == Mutex_tryLockMs(&activityReportsMutex, MAX_LOCK_TIME_MS))
+	if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, MAX_LOCK_TIME_MS))
 	{
 		// We need to discard the volatile qualifier; it is safe to do so since we're mutex-locked.
-		clock_gettime(CLOCK_REALTIME, (struct timespec*) &activityReports[threadIndex]);
+		clock_gettime(CLOCK_REALTIME, (struct timespec*) &g_activityReports[threadIndex]);
 
 		// It's possible for error to arise while unlocking mutex,
 		// but handling it here is unproductive.
-		Mutex_unlock(&activityReportsMutex);
+		Mutex_unlock(&g_activityReportsMutex);
 	}
 	else
 	{
@@ -94,17 +94,17 @@ int WatchdogThread(void* rawParams)
 
 	// Initialize activity reports with current time value
 	// to prevent them from being instantly recognized as unresponsive
-	if (thrd_success == Mutex_tryLockMs(&activityReportsMutex, MUTEX_WAIT_TIME_MS))
+	if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, MUTEX_WAIT_TIME_MS))
 	{
 		struct timespec now;
 		clock_gettime(CLOCK_REALTIME, &now);
 		
 		for (int ii = 0; ii < TID_COUNT_; ++ii)
 		{
-			activityReports[ii] = now;
+			g_activityReports[ii] = now;
 		}
 		
-		if (thrd_success != Mutex_unlock(&activityReportsMutex))
+		if (thrd_success != Mutex_unlock(&g_activityReportsMutex))
 		{
 			Log(LLEVEL_ERROR, "watchdog: cannot release mutex");
 		}
@@ -116,12 +116,12 @@ int WatchdogThread(void* rawParams)
 		
 		struct timespec reportsCopy[TID_COUNT_];
 
-		if (thrd_success == Mutex_tryLockMs(&activityReportsMutex, MUTEX_WAIT_TIME_MS))
+		if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, MUTEX_WAIT_TIME_MS))
 		{
-			// Discard volatile on activityReports since we're mutex-locked.
-			memcpy(reportsCopy, (void*) activityReports, sizeof(activityReports));
+			// Discard volatile on g_activityReports since we're mutex-locked.
+			memcpy(reportsCopy, (void*) g_activityReports, sizeof(g_activityReports));
 			
-			if (thrd_success != Mutex_unlock(&activityReportsMutex))
+			if (thrd_success != Mutex_unlock(&g_activityReportsMutex))
 			{
 				Log(LLEVEL_ERROR, "watchdog: cannot release mutex");
 			}

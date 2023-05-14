@@ -4,23 +4,23 @@
 #include <sys/sysinfo.h>
 
 
-static atomic_int cpuCount;
-static atomic_bool cpuCountInitialized = false;
+static atomic_int g_cpuCount;
+static atomic_bool g_cpuCountInitialized = false;
 
 
 void CpuCount_init(void)
 {
-	if (true == cpuCountInitialized)
+	if (true == g_cpuCountInitialized)
 	{
 		return;
 	}
 
-	cpuCount = get_nprocs();
-	cpuCountInitialized = true;
+	g_cpuCount = get_nprocs();
+	g_cpuCountInitialized = true;
 }
 
 
 int CpuCount_get(void)
 {
-	return cpuCount;
+	return g_cpuCount;
 }

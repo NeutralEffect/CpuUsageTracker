@@ -4,7 +4,7 @@
 #include "logger.h"
 
 
-static volatile atomic_bool killSwitch = false;
+static volatile atomic_bool g_killSwitch = false;
 
 
 static struct timespec durationMsToTimespecPoint(unsigned ms)
@@ -48,13 +48,13 @@ int Mutex_unlock(mtx_t* mutex)
 
 void Thread_activateKillSwitch()
 {
-	killSwitch = true;
+	g_killSwitch = true;
 }
 
 
 bool Thread_getKillSwitchStatus(void)
 {
-	return killSwitch;
+	return g_killSwitch;
 }
 
 
