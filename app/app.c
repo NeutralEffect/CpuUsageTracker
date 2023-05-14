@@ -75,6 +75,8 @@ int main()
 	thrd_join(readerThrd, &readerResult);
 	thrd_join(analyzerThrd, &analyzerResult);
 	thrd_join(printerThrd, &printerResult);
+	mtx_destroy(&usageInfoMtx);
+	mtx_destroy(&procStatMtx);
 
 	free(usageInfoBuffer);
 	CircularBuffer_destroy(procStatCbuf);

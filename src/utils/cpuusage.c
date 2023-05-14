@@ -1,7 +1,6 @@
 #include "cpuusage.h"
 #include "cpucount.h"
 #include "procstat.h"
-#include <limits.h>
 #include <stdio.h>
 
 
@@ -12,7 +11,7 @@ static PercentageValue_t calculateCpuUsagePercentage(const CpuStat_t* oldStat, c
 {
 	if ((NULL == oldStat) || (NULL == newStat))
 	{
-		return UINT_MAX;
+		return 200;
 	}
 
 	CpuStatValue_t prevIdle = oldStat->values[CSINDEX_IDLE] + oldStat->values[CSINDEX_IOWAIT];

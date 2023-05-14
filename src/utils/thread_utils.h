@@ -10,7 +10,7 @@
  * \param waitTimeS Maximum amount of time to wait for mutex to be locked, in seconds.
  * \return
  * thrd_success if mutex has been locked,
- * thrd_timeout if timeout occured without locking the mutex,
+ * thrd_timedout if timeout occured without locking the mutex,
  * thrd_error if error occured.
 */
 int Mutex_tryLock(mtx_t* mutex, unsigned waitTimeS);
@@ -22,7 +22,7 @@ int Mutex_tryLock(mtx_t* mutex, unsigned waitTimeS);
  * \param waitTimeMs Maximum amount of time to wait for mutex to be locked, in milliseconds.
  * \return 
  * thrd_success if mutex has been locked,
- * thrd_timeout if timeout occured without locking the mutex,
+ * thrd_timedout if timeout occured without locking the mutex,
  * thrd_error if error occured.
 */
 int Mutex_tryLockMs(mtx_t* mutex, unsigned waitTimeMs);
