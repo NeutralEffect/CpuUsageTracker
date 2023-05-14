@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['readerthreadparams_5ft_145',['ReaderThreadParams_t',['../reader_8h.html#ae8477c58e37f287509dbbb777a51ace2',1,'reader.h']]]
+  ['printerthreadparams_5ft_156',['PrinterThreadParams_t',['../printer_8h.html#a411d7485f072dd89ba68904ad410cfe0',1,'printer.h']]]
 ];

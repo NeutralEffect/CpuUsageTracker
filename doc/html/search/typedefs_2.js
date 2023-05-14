@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['loglevel_5ft_143',['LogLevel_t',['../logger_8h.html#a2ca2e3c8e7d75a8b27b0b7b279a5324c',1,'logger.h']]]
+  ['cpustat_5ft_152',['CpuStat_t',['../procstat_8h.html#aa872553cd60d671f0284c027054610d4',1,'procstat.h']]],
+  ['cpustatindex_5ft_153',['CpuStatIndex_t',['../procstat_8h.html#a05aefe336543501a26bce0913e8301ca',1,'procstat.h']]],
+  ['cpuusageinfo_5ft_154',['CpuUsageInfo_t',['../cpuusage_8h.html#a7c39d410204790aa68f40847a3c0759b',1,'cpuusage.h']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['printerthreadparams_5ft_144',['PrinterThreadParams_t',['../printer_8h.html#a411d7485f072dd89ba68904ad410cfe0',1,'printer.h']]]
+  ['loglevel_5ft_155',['LogLevel_t',['../logger_8h.html#a2ca2e3c8e7d75a8b27b0b7b279a5324c',1,'logger.h']]]
 ];

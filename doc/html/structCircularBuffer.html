@@ -67,25 +67,100 @@ $(function() {
 <div class="title">CircularBuffer Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="circbuf__types_8h_source.html">circbuf_types.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:adb0c1121811f26959027dd8229f63637"><td class="memItemLeft" align="right" valign="top"><a id="adb0c1121811f26959027dd8229f63637"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>buffer</b></td></tr>
+<tr class="memitem:adb0c1121811f26959027dd8229f63637"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCircularBuffer.html#adb0c1121811f26959027dd8229f63637">buffer</a></td></tr>
 <tr class="separator:adb0c1121811f26959027dd8229f63637"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3ac4459404b53bdcb006642ba705a3b"><td class="memItemLeft" align="right" valign="top"><a id="aa3ac4459404b53bdcb006642ba705a3b"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>capacity</b></td></tr>
+<tr class="memitem:aa3ac4459404b53bdcb006642ba705a3b"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCircularBuffer.html#aa3ac4459404b53bdcb006642ba705a3b">capacity</a></td></tr>
 <tr class="separator:aa3ac4459404b53bdcb006642ba705a3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7ff5ac8d50da5d37adaf51a62c0f5af"><td class="memItemLeft" align="right" valign="top"><a id="af7ff5ac8d50da5d37adaf51a62c0f5af"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>readOffset</b></td></tr>
+<tr class="memitem:af7ff5ac8d50da5d37adaf51a62c0f5af"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCircularBuffer.html#af7ff5ac8d50da5d37adaf51a62c0f5af">readOffset</a></td></tr>
 <tr class="separator:af7ff5ac8d50da5d37adaf51a62c0f5af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04db068ffd511e1f7284a1fb3cd2655b"><td class="memItemLeft" align="right" valign="top"><a id="a04db068ffd511e1f7284a1fb3cd2655b"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>itemCount</b></td></tr>
+<tr class="memitem:a04db068ffd511e1f7284a1fb3cd2655b"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCircularBuffer.html#a04db068ffd511e1f7284a1fb3cd2655b">itemCount</a></td></tr>
 <tr class="separator:a04db068ffd511e1f7284a1fb3cd2655b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2802cb36429e08485f63717f31ce420"><td class="memItemLeft" align="right" valign="top"><a id="af2802cb36429e08485f63717f31ce420"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>itemSize</b></td></tr>
+<tr class="memitem:af2802cb36429e08485f63717f31ce420"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCircularBuffer.html#af2802cb36429e08485f63717f31ce420">itemSize</a></td></tr>
 <tr class="separator:af2802cb36429e08485f63717f31ce420"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Circular buffer control structure. </p>
+</div><h2 class="groupheader">Field Documentation</h2>
+<a id="adb0c1121811f26959027dd8229f63637"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb0c1121811f26959027dd8229f63637">&#9670;&nbsp;</a></span>buffer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* CircularBuffer::buffer</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Pointer to data buffer. </p>
+
+</div>
+</div>
+<a id="aa3ac4459404b53bdcb006642ba705a3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3ac4459404b53bdcb006642ba705a3b">&#9670;&nbsp;</a></span>capacity</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t CircularBuffer::capacity</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Maximum item capacity of this circular buffer. </p>
+
+</div>
+</div>
+<a id="a04db068ffd511e1f7284a1fb3cd2655b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04db068ffd511e1f7284a1fb3cd2655b">&#9670;&nbsp;</a></span>itemCount</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t CircularBuffer::itemCount</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Number of items currently held within buffer. </p>
+
+</div>
+</div>
+<a id="af2802cb36429e08485f63717f31ce420"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2802cb36429e08485f63717f31ce420">&#9670;&nbsp;</a></span>itemSize</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t CircularBuffer::itemSize</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Size of single item in bytes. </p>
+
+</div>
+</div>
+<a id="af7ff5ac8d50da5d37adaf51a62c0f5af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7ff5ac8d50da5d37adaf51a62c0f5af">&#9670;&nbsp;</a></span>readOffset</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t CircularBuffer::readOffset</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Current read offset. </p>
+
+</div>
+</div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>libs/circbuf/<a class="el" href="circbuf__types_8h_source.html">circbuf_types.h</a></li>
 </ul>

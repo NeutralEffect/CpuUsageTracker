@@ -1,3 +1,7 @@
+/**
+ * \file circbuf_types.h
+ * Circular buffer public interface.
+*/
 #ifndef CIRCBUF_H_INCLUDED
 #define CIRCBUF_H_INCLUDED
 #include <stddef.h>
@@ -5,6 +9,9 @@
 #include <stdbool.h>
 
 
+/**
+ * Circular buffer handle type, used in every operation on circular buffer.
+*/
 typedef struct CircularBuffer CircularBuffer_t;
 
 
