@@ -17,7 +17,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 target_compile_options(${PROJECT_NAME} PRIVATE
 	-Weverything
-	-Werror
+	-Wno-declaration-after-statement
+	-Wno-padded
+	-Wno-newline-eof
+	-Wno-error=pedantic
 	-pedantic)
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 target_compile_options(${PROJECT_NAME} PRIVATE

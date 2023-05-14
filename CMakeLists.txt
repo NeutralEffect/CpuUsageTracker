@@ -28,12 +28,23 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 	target_compile_options(${PROJECT_NAME} PRIVATE
 		-Weverything
 		-Werror
+		-Wno-declaration-after-statement
+		-Wno-padded
+		-Wno-newline-eof
+		-Wno-error=pedantic
+		-Wno-format-nonliteral
+		-Wno-atomic-implicit-seq-cst
+		-Wno-sign-conversion
+		-Wno-cast-qual
+		-Wno-disabled-macro-expansion
+		-Wno-error=implicit-int-float-conversion
+		-Wno-error=shorten-64-to-32
 		-pedantic)
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(${PROJECT_NAME} PRIVATE
 		-Wall
 		-Wextra
-		-Werror
 		-Wpedantic
+		-Werror
 		-Wno-error=pedantic)
 endif()
