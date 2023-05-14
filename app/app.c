@@ -30,7 +30,8 @@ int main()
 	mtx_init(&procStatMtx, mtx_timed);
 	mtx_init(&usageInfoMtx, mtx_timed);
 	CircularBuffer_t* procStatCbuf = CircularBuffer_create(ProcStat_size(), 10u);
-	CpuUsageInfo_t* usageInfoBuffer = malloc(CpuUsageInfo_size());
+	CpuUsageInfo_t* usageInfoBuffer = calloc(1, CpuUsageInfo_size());
+	
 
 	thrd_t watchdogThrd;
 	thrd_t loggerThrd;

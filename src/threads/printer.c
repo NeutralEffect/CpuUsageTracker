@@ -67,6 +67,7 @@ int PrinterThread(void* rawParams)
 				// Since only this code will ever read from that buffer
 				// and it will never be assigned non-positive value outside of this block
 				// it's a safe way of ensuring that we don't consume the same values more than once.
+				// However, the structure HAS TO be initialized before going into use.
 				if (params->buffer->valuesLength != 0)
 				{
 					memcpy(usageInfoBuffer, params->buffer, CpuUsageInfo_size());
@@ -84,7 +85,7 @@ int PrinterThread(void* rawParams)
 					break;
 				}
 
-				system("clear");
+				// system("clear");
 				printFormattedCpuUsage(usageInfoBuffer);
 			}
 			break;
