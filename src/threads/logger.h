@@ -4,18 +4,39 @@
 #include "circbuf.h"
 
 
+/**
+ * Maximum length of single log message. Longer messages will be truncated.
+*/
 #define LOG_MESSAGE_MAX_LENGTH 1024
 
 
+/**
+ * Logging levels available in program.
+*/
 typedef enum LogLevel
 {
+	/** Logging disabled. */
 	LLEVEL_NONE = 0,
+
+	/** Fatal errors necessitating program termination. */
 	LLEVEL_FATAL,
+
+	/** Non-fatal errors which might cause program malfunction. */
 	LLEVEL_ERROR,
+
+	/** Warnings about unusual or hazardous circumstances. */
 	LLEVEL_WARNING,
+
+	/** Informational messages regarding normal program operation. */
 	LLEVEL_INFO,
+
+	/** Detailed information about program's state'. */
 	LLEVEL_DEBUG,
+
+	/** Raw data and complex information. */
 	LLEVEL_TRACE,
+	
+	/** Amount of values in this enum, not a valid value by itself. */
 	LLEVEL_COUNT_
 }
 LogLevel_t;
@@ -25,6 +46,8 @@ LogLevel_t;
  * \brief Send formated message to the log output
  * that will be visible only at or above given logging level.
  * Message formatting follows printf function family formatting.
+ * \warning Requires call to Logger_init() to be completed before using,
+ * otherwise might result in undefined behavior.
  * \param logLevel Logging level for message to be assigned.
  * \param format Message format specifier.
  * \param ... Format arguments.
@@ -32,6 +55,9 @@ LogLevel_t;
 void Log(LogLevel_t logLevel, const char* format, ...);
 
 
+/**
+ * \brief Initializes logger module. Should be called before using any other components from this module.
+*/
 void Logger_init(void);
 
 
@@ -45,11 +71,16 @@ void Logger_setLogLevel(LogLevel_t newLogLevel);
 
 
 /**
- * \brief Shorthand for sending message with current source file name and line number into info log output.
+ * \brief Shorthand for sending message with current source file name and line number into debug log output.
 */
 #define LogFileLine() do { Log(LLEVEL_DEBUG, "%s:%i", __FILE__, __LINE__); } while (0)
 
 
+/**
+ * \brief Thread function for retrieving log messages from program components and saving them into a text file.
+ * \warning This thread should be launched before logging functionality is used.
+ * \param params Ignored.
+*/
 int LoggerThread(void* params);
 
 
