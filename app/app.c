@@ -13,8 +13,7 @@
 #include "cpuusage.h"
 #include "procstat.h"
 #include "cpucount.h"
-#include "log.h"
-
+#include "logger.h"
 
 
 int main()
@@ -22,8 +21,9 @@ int main()
 	RegisterSigintHandler();
 	RegisterSigtermHandler();
 	CpuCount_init();
+	Logger_init();
 	Watchdog_init();
-	SetLogLevel(LLEVEL_ERROR);
+	Logger_setLogLevel(LLEVEL_TRACE);
 
 	mtx_t procStatMtx;
 	mtx_t usageInfoMtx;
@@ -78,6 +78,6 @@ int main()
 
 	free(usageInfoBuffer);
 	CircularBuffer_destroy(procStatCbuf);
-	
+
 	return 0;
 }

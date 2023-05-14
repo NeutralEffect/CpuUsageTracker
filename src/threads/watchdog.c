@@ -1,6 +1,6 @@
 #include "watchdog.h"
 #include "thread_utils.h"
-#include "log.h"
+#include "logger.h"
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>

@@ -1,7 +1,7 @@
 #include "file.h"
 #include <stdio.h>
 #include <limits.h>
-#include "log.h"
+#include "logger.h"
 
 
 int File_readContentInto(const char* fileName, char* bufPtr, size_t bufSz)

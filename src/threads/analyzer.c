@@ -3,7 +3,7 @@
 #include "procstat.h"
 #include "stdlib.h"
 #include "cpuusage.h"
-#include "log.h"
+#include "logger.h"
 #include "watchdog.h"
 #include <string.h>
 #include <threads.h>

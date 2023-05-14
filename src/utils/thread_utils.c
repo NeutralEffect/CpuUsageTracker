@@ -1,7 +1,7 @@
 #include "thread_utils.h"
 #include <threads.h>
 #include <stdatomic.h>
-#include "log.h"
+#include "logger.h"
 
 
 static volatile atomic_bool killSwitch = false;

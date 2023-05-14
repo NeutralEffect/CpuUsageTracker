@@ -1,7 +1,7 @@
 #include "printer.h"
 #include "thread_utils.h"
 #include "cpuusage.h"
-#include "log.h"
+#include "logger.h"
 #include "watchdog.h"
 #include <stdlib.h>
 #include <stdio.h>

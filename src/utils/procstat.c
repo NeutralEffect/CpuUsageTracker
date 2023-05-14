@@ -1,5 +1,5 @@
 #include "procstat.h"
-#include "log.h"
+#include "logger.h"
 #include "file.h"
 #include "cpucount.h"
 #include <string.h>
