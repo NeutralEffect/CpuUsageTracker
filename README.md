@@ -14,3 +14,6 @@ Program is implemented through five synchronized threads communicating with each
 ### Libraries
 - `circbuf` - Simple circular buffer library following object-oriented design schemes.
 -->
+
+## Documentation
+Code documentation follows Doxygen C syntax. Generated documentation can be found [here](doc/html/index.html).
