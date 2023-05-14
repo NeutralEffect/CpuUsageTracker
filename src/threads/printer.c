@@ -85,7 +85,7 @@ int PrinterThread(void* rawParams)
 					break;
 				}
 
-				// system("clear");
+				system("clear");
 				printFormattedCpuUsage(usageInfoBuffer);
 			}
 			break;

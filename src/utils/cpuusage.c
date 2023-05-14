@@ -40,7 +40,7 @@ static PercentageValue_t calculateCpuUsagePercentage(const CpuStat_t* oldStat, c
 	CpuStatValue_t totald = total - prevTotal;
 	CpuStatValue_t idled = idle - prevIdle;
 
-	PercentageValue_t result = ((float) totald - idled) / totald;
+	PercentageValue_t result = ((double) totald - idled) / totald;
 	// Adjust from fraction to percentage
 	return result * 100.0;
 }

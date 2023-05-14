@@ -32,7 +32,6 @@ int main()
 	CircularBuffer_t* procStatCbuf = CircularBuffer_create(ProcStat_size(), 10u);
 	CpuUsageInfo_t* usageInfoBuffer = calloc(1, CpuUsageInfo_size());
 	
-
 	thrd_t watchdogThrd;
 	thrd_t loggerThrd;
 	thrd_t readerThrd;

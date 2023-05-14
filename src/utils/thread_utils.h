@@ -39,7 +39,7 @@ int Mutex_unlock(mtx_t* mutex);
 /**
  * \brief Activate kill switch, atomically setting it's value.
 */
-void Thread_activateKillSwitch();
+void Thread_activateKillSwitch(void);
 
 
 /**
@@ -52,7 +52,7 @@ void Thread_forceSleep(unsigned seconds);
 
 /**
  * \brief As Thread_forceSleep, but measuring duration in milliseconds.
- * \param seconds Amount of time for thread to be blocked for, in milliseconds.
+ * \param milliseconds Amount of time for thread to be blocked for, in milliseconds.
 */
 void Thread_forceSleepMs(unsigned milliseconds);
 
@@ -74,7 +74,7 @@ int Thread_sleep(unsigned seconds);
 
 /**
  * \brief As Thread_sleep, but measuring duration in milliseconds.
- * \param seconds Amount of time for thread to be blocked for, in milliseconds.
+ * \param milliseconds Amount of time for thread to be blocked for, in milliseconds.
  * \return As Thread_sleep.
 */
 int Thread_sleepMs(unsigned milliseconds);
