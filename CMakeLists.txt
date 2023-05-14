@@ -4,6 +4,8 @@ project(CpuUsageTracker
 	DESCRIPTION "CPU usage tracker for Linux-based systems"
 	LANGUAGES C)
 	
+enable_testing()
+
 add_executable(${PROJECT_NAME} app/app.c)
 
 # Those directives could be moved to CMakeLists.txt inside /libs
@@ -13,6 +15,7 @@ target_link_libraries(${PROJECT_NAME} CircularBuffer)
 
 add_subdirectory(libs)
 add_subdirectory(src)
+add_subdirectory(test)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	C_STANDARD 11
