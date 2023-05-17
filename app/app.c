@@ -38,32 +38,44 @@ int main()
 	thrd_t analyzerThrd;
 	thrd_t printerThrd;
 
-	thrd_create(&watchdogThrd, WatchdogThread, NULL);
+	thrd_create(
+		&watchdogThrd,
+		WatchdogThread,
+		NULL);
 
-	thrd_create(&loggerThrd, LoggerThread, NULL);
+	thrd_create(
+		&loggerThrd,
+		LoggerThread,
+		NULL);
 
-	ReaderThreadParams_t readerThrdParams = 
-	{
-		.mutex 		= &procStatMtx,
-		.buffer = procStatCbuf
-	};
-	thrd_create(&readerThrd, ReaderThread, &readerThrdParams);
+	thrd_create(
+		&readerThrd,
+		ReaderThread,
+		&(ReaderThreadParams_t)
+		{
+			.mutex 	= &procStatMtx,
+			.buffer = procStatCbuf
+		});
 
-	AnalyzerThreadParams_t analyzerThrdParams = 
-	{
-		.inputMutex 	= &procStatMtx,
-		.inputBuffer 	= procStatCbuf,
-		.outputMutex	= &usageInfoMtx,
-		.outputBuffer	= usageInfoBuffer
-	};
-	thrd_create(&analyzerThrd, AnalyzerThread, &analyzerThrdParams);
+	thrd_create(
+		&analyzerThrd, 
+		AnalyzerThread,
+		&(AnalyzerThreadParams_t)
+		{
+			.inputMutex 	= &procStatMtx,
+			.inputBuffer 	= procStatCbuf,
+			.outputMutex	= &usageInfoMtx,
+			.outputBuffer	= usageInfoBuffer
+		});
 
-	PrinterThreadParams_t printerThrdParams =
-	{
-		.mutex = &usageInfoMtx,
-		.buffer = usageInfoBuffer
-	};
-	thrd_create(&printerThrd, PrinterThread, &printerThrdParams);
+	thrd_create(
+		&printerThrd,
+		PrinterThread,
+		&(PrinterThreadParams_t)
+		{
+			.mutex 	= &usageInfoMtx,
+			.buffer = usageInfoBuffer
+		});
 
 	int watchdogResult;
 	int loggerResult;
