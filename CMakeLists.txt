@@ -6,6 +6,32 @@ project(CpuUsageTracker
 	
 enable_testing()
 
+set(CUT_CLANG_COMPILE_FLAGS
+	-Weverything
+	-Werror
+	-Wno-unused-macros
+	-Wno-unused-function
+	-Wno-declaration-after-statement
+	-Wno-padded
+	-Wno-newline-eof
+	-Wno-error=pedantic
+	-Wno-format-nonliteral
+	-Wno-atomic-implicit-seq-cst
+	-Wno-sign-conversion
+	-Wno-cast-qual
+	-Wno-disabled-macro-expansion
+	-Wno-missing-prototypes
+	-Wno-error=implicit-int-float-conversion
+	-Wno-error=shorten-64-to-32
+	-pthread)
+
+set(CUT_GCC_COMPILE_FLAGS
+	-Wall
+	-Wextra
+	-Wpedantic
+	-Werror
+	-Wno-error=pedantic)
+
 add_executable(${PROJECT_NAME} app/app.c)
 
 # Those directives could be moved to CMakeLists.txt inside /libs
@@ -28,31 +54,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 # Set compiler-specific flags to enforce stricter rules
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-	target_compile_options(${PROJECT_NAME} PRIVATE
-		-Weverything
-		-Werror
-		-Wno-unused-macros
-		-Wno-unused-function
-		-Wno-declaration-after-statement
-		-Wno-padded
-		-Wno-newline-eof
-		-Wno-error=pedantic
-		-Wno-format-nonliteral
-		-Wno-atomic-implicit-seq-cst
-		-Wno-sign-conversion
-		-Wno-cast-qual
-		-Wno-disabled-macro-expansion
-		-Wno-missing-prototypes
-		-Wno-error=implicit-int-float-conversion
-		-Wno-error=shorten-64-to-32
-		-pthread
-		-pedantic)
+	target_compile_options(${PROJECT_NAME} PRIVATE ${CUT_CLANG_COMPILE_FLAGS})
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-	target_compile_options(${PROJECT_NAME} PRIVATE
-		-Wall
-		-Wextra
-		-Wpedantic
-		-Werror
-		-Wno-error=pedantic
-		-pthread)
+	target_compile_options(${PROJECT_NAME} PRIVATE ${CUT_GCC_COMPILE_FLAGS})
 endif()
