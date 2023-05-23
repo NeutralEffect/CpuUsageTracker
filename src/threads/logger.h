@@ -4,8 +4,6 @@
 */
 #ifndef LOGGER_H_INCLUDED
 #define LOGGER_H_INCLUDED
-#include <threads.h>
-#include "circbuf.h"
 
 
 /**
