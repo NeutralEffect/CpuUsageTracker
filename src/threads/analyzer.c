@@ -1,5 +1,5 @@
 #include "analyzer.h"
-#include "thread_utils.h"
+#include "sync.h"
 #include "procstat.h"
 #include "stdlib.h"
 #include "cpuusage.h"

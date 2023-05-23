@@ -2,7 +2,7 @@
 #include <threads.h>
 #include <stdatomic.h>
 #include "procstat.h"
-#include "thread_utils.h"
+#include "sync.h"
 #include "logger.h"
 #include "watchdog.h"
 

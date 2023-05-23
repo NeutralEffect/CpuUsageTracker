@@ -4,7 +4,7 @@
 */
 #ifndef PRINTER_H_INCLUDED
 #define PRINTER_H_INCLUDED
-#include <threads.h>
+#include "sync_types.h"
 #include "cpuusage.h"
 
 

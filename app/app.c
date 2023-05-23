@@ -2,7 +2,7 @@
 #include <threads.h>
 #include <time.h>
 #include <stdlib.h>
-#include "thread_utils.h"
+#include "sync.h"
 #include "circbuf.h"
 #include "sighandlers.h"
 #include "reader.h"

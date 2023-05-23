@@ -1,4 +1,4 @@
-#include "thread_utils.h"
+#include "sync.h"
 #include <threads.h>
 #include <assert.h>
 #include <stdio.h>

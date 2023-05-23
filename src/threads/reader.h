@@ -4,7 +4,7 @@
 */
 #ifndef READER_H_INCLUDED
 #define READER_H_INCLUDED
-#include <threads.h>
+#include "sync_types.h"
 #include "circbuf.h"
 
 

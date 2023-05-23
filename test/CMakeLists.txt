@@ -44,7 +44,7 @@ target_include_directories(ThreadUtilsTests
 		.)
 
 target_sources(ThreadUtilsTests PRIVATE
-	${CMAKE_SOURCE_DIR}/src/utils/thread_utils.c)
+	${CMAKE_SOURCE_DIR}/src/utils/sync.c)
 
 set_target_properties(ThreadUtilsTests PROPERTIES
 	C_STANDARD 11

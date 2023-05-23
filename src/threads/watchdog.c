@@ -1,5 +1,5 @@
 #include "watchdog.h"
-#include "thread_utils.h"
+#include "sync.h"
 #include "logger.h"
 #include <signal.h>
 #include <string.h>

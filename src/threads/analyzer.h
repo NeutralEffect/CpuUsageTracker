@@ -4,7 +4,7 @@
 */
 #ifndef ANALYZER_H_INCLUDED
 #define ANALYZER_H_INCLUDED
-#include <threads.h>
+#include "sync.h"
 #include "circbuf.h"
 #include "cpuusage.h"
 

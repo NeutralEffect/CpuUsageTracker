@@ -4,6 +4,7 @@
 */
 #ifndef THREAD_UTILS_H_INCLUDED
 #define THREAD_UTILS_H_INCLUDED
+#include "sync_types.h"
 #include <stdbool.h>
 #include <threads.h>
 
@@ -17,7 +18,7 @@
  * thrd_timedout if timeout occured without locking the mutex,
  * thrd_error if error occured.
 */
-int Mutex_tryLock(mtx_t* mutex, unsigned waitTimeS);
+int Mutex_tryLock(MutexHandle_t mutex, unsigned waitTimeS);
 
 
 /**
@@ -29,7 +30,7 @@ int Mutex_tryLock(mtx_t* mutex, unsigned waitTimeS);
  * thrd_timedout if timeout occured without locking the mutex,
  * thrd_error if error occured.
 */
-int Mutex_tryLockMs(mtx_t* mutex, unsigned waitTimeMs);
+int Mutex_tryLockMs(MutexHandle_t mutex, unsigned waitTimeMs);
 
 
 /**
@@ -37,7 +38,7 @@ int Mutex_tryLockMs(mtx_t* mutex, unsigned waitTimeMs);
  * \param mutex Mutex to be unlocked.
  * \return thrd_success if succesful, thrd_error otherwise.
 */
-int Mutex_unlock(mtx_t* mutex);
+int Mutex_unlock(MutexHandle_t mutex);
 
 
 /**
