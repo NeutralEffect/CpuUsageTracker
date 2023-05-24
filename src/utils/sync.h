@@ -9,6 +9,15 @@
 #include <threads.h>
 
 
+int CondVar_notify(CondVarHandle_t cv);
+
+
+int CondVar_notifyAll(CondVarHandle_t cv);
+
+
+int CondVar_waitMs(CondVarHandle_t cv, MutexHandle_t mtx, unsigned ms);
+
+
 /**
  * \brief Attempts to lock mutex either until successful or specified amount of time has passed.
  * \param mutex Mutex to be locked.

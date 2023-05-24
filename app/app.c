@@ -23,12 +23,22 @@ int main()
 	CpuCount_init();
 	Logger_init();
 	Watchdog_init();
+
 	Logger_setLogLevel(LLEVEL_TRACE);
 
 	mtx_t procStatMtx;
 	mtx_t usageInfoMtx;
 	mtx_init(&procStatMtx, mtx_timed);
 	mtx_init(&usageInfoMtx, mtx_timed);
+	cnd_t procStatNotEmptyCv;
+	cnd_t procStatNotFullCv;
+	cnd_t usageInfoNotEmptyCv;
+	cnd_t usageInfoNotFullCv;
+	cnd_init(&procStatNotEmptyCv);
+	cnd_init(&procStatNotFullCv);
+	cnd_init(&usageInfoNotEmptyCv);
+	cnd_init(&usageInfoNotFullCv);
+
 	CircularBuffer_t* procStatCbuf = CircularBuffer_create(ProcStat_size(), 10u);
 	CpuUsageInfo_t* usageInfoBuffer = calloc(1, CpuUsageInfo_size());
 	
@@ -53,8 +63,10 @@ int main()
 		ReaderThread,
 		&(ReaderThreadParams_t)
 		{
-			.outMtx = &procStatMtx,
-			.outBuf = procStatCbuf
+			.outMtx 		= &procStatMtx,
+			.outNotEmptyCv 	= &procStatNotEmptyCv,
+			.outNotFullCv 	= &procStatNotFullCv,
+			.outBuf 		= procStatCbuf
 		});
 
 	thrd_create(
@@ -62,10 +74,14 @@ int main()
 		AnalyzerThread,
 		&(AnalyzerThreadParams_t)
 		{
-			.inMtx 	= &procStatMtx,
-			.inBuf 	= procStatCbuf,
-			.outMtx	= &usageInfoMtx,
-			.outBuf	= usageInfoBuffer
+			.inMtx 			= &procStatMtx,
+			.inNotEmptyCv 	= &procStatNotEmptyCv,
+			.inNotFullCv 	= &procStatNotFullCv,
+			.inBuf 			= procStatCbuf,
+			.outMtx			= &usageInfoMtx,
+			.outNotEmptyCv 	= &usageInfoNotEmptyCv,
+			.outNotFullCv 	= &usageInfoNotFullCv,
+			.outBuf			= usageInfoBuffer
 		});
 
 	thrd_create(
@@ -73,8 +89,10 @@ int main()
 		PrinterThread,
 		&(PrinterThreadParams_t)
 		{
-			.inMtx 	= &usageInfoMtx,
-			.inBuf = usageInfoBuffer
+			.inMtx 			= &usageInfoMtx,
+			.inNotEmptyCv 	= &usageInfoNotEmptyCv,
+			.inNotFullCv 	= &usageInfoNotFullCv,
+			.inBuf 			= usageInfoBuffer
 		});
 
 	int watchdogResult;
@@ -82,11 +100,15 @@ int main()
 	int readerResult;
 	int analyzerResult;
 	int printerResult;
-	thrd_join(watchdogThrd, &watchdogResult);
-	thrd_join(loggerThrd, &loggerResult);
-	thrd_join(readerThrd, &readerResult);
-	thrd_join(analyzerThrd, &analyzerResult);
 	thrd_join(printerThrd, &printerResult);
+	thrd_join(analyzerThrd, &analyzerResult);
+	thrd_join(readerThrd, &readerResult);
+	thrd_join(loggerThrd, &loggerResult);
+	thrd_join(watchdogThrd, &watchdogResult);
+	cnd_destroy(&usageInfoNotFullCv);
+	cnd_destroy(&usageInfoNotEmptyCv);
+	cnd_destroy(&procStatNotFullCv);
+	cnd_destroy(&usageInfoNotEmptyCv);
 	mtx_destroy(&usageInfoMtx);
 	mtx_destroy(&procStatMtx);
 

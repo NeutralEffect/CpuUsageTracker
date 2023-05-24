@@ -26,6 +26,31 @@ static struct timespec durationMsToTimespecPoint(unsigned ms)
 }
 
 
+int CondVar_notify(CondVarHandle_t cv)
+{
+	return cnd_signal(cv);
+}
+
+
+int CondVar_notifyAll(CondVarHandle_t cv)
+{
+	return cnd_broadcast(cv);
+}
+
+
+int CondVar_waitMs(CondVarHandle_t cv, MutexHandle_t mtx, unsigned ms)
+{
+	if ( (NULL == cv) || (NULL == mtx) )
+	{
+		return thrd_error;
+	}
+
+	const struct timespec timePoint = durationMsToTimespecPoint(ms);
+
+	return cnd_timedwait(cv, mtx, &timePoint);
+}
+
+
 int Mutex_tryLock(MutexHandle_t mutex, unsigned waitTimeS)
 {
 	return Mutex_tryLockMs(mutex, waitTimeS * 1000u);
