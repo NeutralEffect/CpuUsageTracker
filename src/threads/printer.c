@@ -55,7 +55,7 @@ int PrinterThread(void* rawParams)
 	{
 		Watchdog_reportActive(TID_PRINTER);
 
-		int mtxstatus = Mutex_tryLockMs(params->mutex, MUTEX_WAIT_TIME_MS);
+		int mtxstatus = Mutex_tryLockMs(params->inMtx, MUTEX_WAIT_TIME_MS);
 
 		switch (mtxstatus)
 		{
@@ -68,14 +68,14 @@ int PrinterThread(void* rawParams)
 				// and it will never be assigned non-positive value outside of this block
 				// it's a safe way of ensuring that we don't consume the same values more than once.
 				// However, the structure HAS TO be initialized before going into use.
-				if (params->buffer->valuesLength != 0)
+				if (params->inBuf->valuesLength != 0)
 				{
-					memcpy(usageInfoBuffer, params->buffer, CpuUsageInfo_size());
-					params->buffer->valuesLength = 0;
+					memcpy(usageInfoBuffer, params->inBuf, CpuUsageInfo_size());
+					params->inBuf->valuesLength = 0;
 					newValuesRead = true;
 				}
 
-				if (thrd_success != Mutex_unlock(params->mutex))
+				if (thrd_success != Mutex_unlock(params->inMtx))
 				{
 					Log(LLEVEL_ERROR, "printer: error while releasing mutex");
 				}

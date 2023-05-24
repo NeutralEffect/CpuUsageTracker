@@ -127,7 +127,7 @@ int AnalyzerThread(void* rawParams)
 	}
 
 	while (
-		(0 != waitForData(params->inputMutex, params->inputBuffer, oldStatBuffer)) &&
+		(0 != waitForData(params->inMtx, params->inBuf, oldStatBuffer)) &&
 		(false == Thread_getKillSwitchStatus()))
 	{
 		Watchdog_reportActive(TID_ANALYZER);
@@ -151,7 +151,7 @@ int AnalyzerThread(void* rawParams)
 	{
 		Watchdog_reportActive(TID_ANALYZER);
 
-		const int dataReadStatus = readDataTimeout(params->inputMutex, params->inputBuffer, newStatBuffer, MUTEX_WAIT_TIME_MS);
+		const int dataReadStatus = readDataTimeout(params->inMtx, params->inBuf, newStatBuffer, MUTEX_WAIT_TIME_MS);
 
 		switch (dataReadStatus)
 		{
@@ -159,10 +159,10 @@ int AnalyzerThread(void* rawParams)
 			{
 				CpuUsageInfo_calculate(oldStatBuffer, newStatBuffer, usageInfoBuffer);
 
-				if (thrd_success == Mutex_tryLockMs(params->outputMutex, MUTEX_WAIT_TIME_MS))
+				if (thrd_success == Mutex_tryLockMs(params->outMtx, MUTEX_WAIT_TIME_MS))
 				{
-					memcpy(params->outputBuffer, usageInfoBuffer, CpuUsageInfo_size());
-					Mutex_unlock(params->outputMutex);
+					memcpy(params->outBuf, usageInfoBuffer, CpuUsageInfo_size());
+					Mutex_unlock(params->outMtx);
 					Log(LLEVEL_DEBUG, "analyzer: usage stats sent");
 				}
 

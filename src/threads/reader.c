@@ -36,12 +36,12 @@ int ReaderThread(void* rawParams)
 		else
 		{
 			// Procstat has been acquired, lock mutex on circular buffer and write
-			if (thrd_success == Mutex_tryLockMs(params->mutex, MUTEX_WAIT_TIME_MS))
+			if (thrd_success == Mutex_tryLockMs(params->outMtx, MUTEX_WAIT_TIME_MS))
 			{
 				// Mutex acquired, write procstat
-				CircularBuffer_write(params->buffer, procStat);
+				CircularBuffer_write(params->outBuf, procStat);
 				// Unlock mutex so analyzer thread can access it
-				Mutex_unlock(params->mutex);
+				Mutex_unlock(params->outMtx);
 				
 				Log(LLEVEL_DEBUG, "reader: procstat data sent");
 				Log(LLEVEL_TRACE, "reader: cpu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 

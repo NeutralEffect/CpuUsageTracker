@@ -53,8 +53,8 @@ int main()
 		ReaderThread,
 		&(ReaderThreadParams_t)
 		{
-			.mutex 	= &procStatMtx,
-			.buffer = procStatCbuf
+			.outMtx = &procStatMtx,
+			.outBuf = procStatCbuf
 		});
 
 	thrd_create(
@@ -62,10 +62,10 @@ int main()
 		AnalyzerThread,
 		&(AnalyzerThreadParams_t)
 		{
-			.inputMutex 	= &procStatMtx,
-			.inputBuffer 	= procStatCbuf,
-			.outputMutex	= &usageInfoMtx,
-			.outputBuffer	= usageInfoBuffer
+			.inMtx 	= &procStatMtx,
+			.inBuf 	= procStatCbuf,
+			.outMtx	= &usageInfoMtx,
+			.outBuf	= usageInfoBuffer
 		});
 
 	thrd_create(
@@ -73,8 +73,8 @@ int main()
 		PrinterThread,
 		&(PrinterThreadParams_t)
 		{
-			.mutex 	= &usageInfoMtx,
-			.buffer = usageInfoBuffer
+			.inMtx 	= &usageInfoMtx,
+			.inBuf = usageInfoBuffer
 		});
 
 	int watchdogResult;

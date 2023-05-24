@@ -15,14 +15,28 @@ typedef struct PrinterThreadParams
 {
 	/**
 	 * Mutex to lock on while reading usage statistics from input buffer.
+	 * This parameter should be shared with analyzer thread.
 	*/
-	mtx_t* mutex;
+	MutexHandle_t inMtx;
 	
 	/**
-	 * Input buffer to read CPU usage statistics from. Buffer should be shared with analyzer thread
-	 * and hold either valid data or be zero-initialized.
+	 * Condition variable to wait on while no data is available in the input buffer.
+	 * This parameter should be shared with analyzer thread.
 	*/
-	CpuUsageInfo_t* buffer;
+	CondVarHandle_t inNotEmptyCv;
+
+	/**
+	 * Condition variable to signal once data has been consumed from input buffer.
+	 * This parameter should be shared with analyzer thread.
+	*/
+	CondVarHandle_t inNotFullCv;
+
+	/**
+	 * Input buffer to read CPU usage statistics from.
+	 * Must be of equal or bigger size than that retrieved by CpuUsageInfo_size() function.
+	 * This parameter should be shared with analyzer thread.
+	*/
+	CpuUsageInfo_t* inBuf;
 }
 PrinterThreadParams_t;
 
