@@ -26,13 +26,13 @@ static struct timespec durationMsToTimespecPoint(unsigned ms)
 }
 
 
-int Mutex_tryLock(mtx_t* mutex, unsigned waitTimeS)
+int Mutex_tryLock(MutexHandle_t mutex, unsigned waitTimeS)
 {
 	return Mutex_tryLockMs(mutex, waitTimeS * 1000u);
 }
 
 
-int Mutex_tryLockMs(mtx_t* mutex, unsigned waitTimeMs)
+int Mutex_tryLockMs(MutexHandle_t mutex, unsigned waitTimeMs)
 {
 	if (NULL == mutex)
 	{
@@ -45,7 +45,7 @@ int Mutex_tryLockMs(mtx_t* mutex, unsigned waitTimeMs)
 }
 
 
-int Mutex_unlock(mtx_t* mutex)
+int Mutex_unlock(MutexHandle_t mutex)
 {
 	return mtx_unlock(mutex);
 }
