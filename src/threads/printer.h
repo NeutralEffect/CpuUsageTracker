@@ -5,6 +5,7 @@
 #ifndef PRINTER_H_INCLUDED
 #define PRINTER_H_INCLUDED
 #include "sync_types.h"
+#include "circbuf.h"
 #include "cpuusage.h"
 
 
@@ -33,10 +34,11 @@ typedef struct PrinterThreadParams
 
 	/**
 	 * Input buffer to read CPU usage statistics from.
-	 * Must be of equal or bigger size than that retrieved by CpuUsageInfo_size() function.
+	 * Underlying CircularBuffer_t structure must be able to hold at least one CpuUsageInfo_t structure,
+	 * size equal to that retrieved by CpuUsageInfo_size() function.
 	 * This parameter should be shared with analyzer thread.
 	*/
-	CpuUsageInfo_t* inBuf;
+	CircularBuffer_t* inBuf;
 }
 PrinterThreadParams_t;
 

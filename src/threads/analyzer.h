@@ -33,7 +33,8 @@ typedef struct AnalyzerThreadParams
 
 	/**
 	 * Buffer to read incoming data from.
-	 * Underlying CircularBuffer_t structure must be able to hold at least one ProcStat_t structure.
+	 * Underlying CircularBuffer_t structure must be able to hold at least one ProcStat_t structure,
+	 * size equal to that retrieved by ProcStat_size() function.
 	 * This parameter should be shared with reader thread.
 	*/
 	CircularBuffer_t* inBuf;
@@ -58,10 +59,11 @@ typedef struct AnalyzerThreadParams
 
 	/**
 	 * Output buffer to periodically write calculated usage statistics into.
-	 * Must be of equal or bigger size than that retrieved by CpuUsageInfo_size() function.
+	 * Underlying CircularBuffer_t structure must be able to hold at least one CpuUsageInfo_t structure,
+	 * size equal to that retrieved by CpuUsageInfo_size() function.
 	 * This parameter should be shared with printer thread.
 	*/
-	CpuUsageInfo_t* outBuf;
+	CircularBuffer_t* outBuf;
 }
 AnalyzerThreadParams_t;
 
