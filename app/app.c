@@ -40,7 +40,7 @@ int main()
 	cnd_init(&usageInfoNotFullCv);
 
 	CircularBuffer_t* procStatCbuf = CircularBuffer_create(ProcStat_size(), 10u);
-	CpuUsageInfo_t* usageInfoBuffer = calloc(1, CpuUsageInfo_size());
+	CircularBuffer_t* usageInfoCbuf = CircularBuffer_create(CpuUsageInfo_size(), 1u);
 	
 	thrd_t watchdogThrd;
 	thrd_t loggerThrd;
@@ -81,7 +81,7 @@ int main()
 			.outMtx			= &usageInfoMtx,
 			.outNotEmptyCv 	= &usageInfoNotEmptyCv,
 			.outNotFullCv 	= &usageInfoNotFullCv,
-			.outBuf			= usageInfoBuffer
+			.outBuf			= usageInfoCbuf
 		});
 
 	thrd_create(
@@ -92,7 +92,7 @@ int main()
 			.inMtx 			= &usageInfoMtx,
 			.inNotEmptyCv 	= &usageInfoNotEmptyCv,
 			.inNotFullCv 	= &usageInfoNotFullCv,
-			.inBuf 			= usageInfoBuffer
+			.inBuf 			= usageInfoCbuf
 		});
 
 	int watchdogResult;
@@ -112,7 +112,7 @@ int main()
 	mtx_destroy(&usageInfoMtx);
 	mtx_destroy(&procStatMtx);
 
-	free(usageInfoBuffer);
+	free(usageInfoCbuf);
 	CircularBuffer_destroy(procStatCbuf);
 
 	return 0;
