@@ -16,6 +16,10 @@
 #include "logger.h"
 
 
+#define PROCSTAT_CBUF_CAPACITY 10u
+#define USAGEINFO_CBUF_CAPACITY 1u
+
+
 int main()
 {
 	RegisterSigintHandler();
@@ -39,8 +43,8 @@ int main()
 	cnd_init(&usageInfoNotEmptyCv);
 	cnd_init(&usageInfoNotFullCv);
 
-	CircularBuffer_t* procStatCbuf = CircularBuffer_create(ProcStat_size(), 10u);
-	CircularBuffer_t* usageInfoCbuf = CircularBuffer_create(CpuUsageInfo_size(), 1u);
+	CircularBuffer_t* procStatCbuf = CircularBuffer_create(ProcStat_size(), PROCSTAT_CBUF_CAPACITY);
+	CircularBuffer_t* usageInfoCbuf = CircularBuffer_create(CpuUsageInfo_size(), USAGEINFO_CBUF_CAPACITY);
 	
 	thrd_t watchdogThrd;
 	thrd_t loggerThrd;
@@ -105,6 +109,7 @@ int main()
 	thrd_join(readerThrd, &readerResult);
 	thrd_join(loggerThrd, &loggerResult);
 	thrd_join(watchdogThrd, &watchdogResult);
+
 	cnd_destroy(&usageInfoNotFullCv);
 	cnd_destroy(&usageInfoNotEmptyCv);
 	cnd_destroy(&procStatNotFullCv);
@@ -112,7 +117,7 @@ int main()
 	mtx_destroy(&usageInfoMtx);
 	mtx_destroy(&procStatMtx);
 
-	free(usageInfoCbuf);
+	CircularBuffer_destroy(usageInfoCbuf);
 	CircularBuffer_destroy(procStatCbuf);
 
 	return 0;
