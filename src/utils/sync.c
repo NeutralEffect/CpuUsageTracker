@@ -4,6 +4,9 @@
 #include "logger.h"
 
 
+#define NANOSECONDS_IN_SECOND 1000000000u
+
+
 static volatile atomic_bool g_killSwitch = false;
 
 
@@ -20,7 +23,18 @@ static struct timespec durationMsToTimespecPoint(unsigned ms)
 	// Can be replaced with formula: (ms % 1000) * 1000000
 	unsigned long long nanoseconds = (ms - (seconds * 1000)) * 1000000;
 	timePoint.tv_sec += seconds;
-	timePoint.tv_nsec += nanoseconds;
+	// Check for nanoseconds overflow
+	if (timePoint.tv_nsec + nanoseconds < NANOSECONDS_IN_SECOND)
+	{
+		// No overflow, proceed as usual
+		timePoint.tv_nsec += nanoseconds;
+	}
+	else
+	{
+		// Overflow, adjust for carry-over
+		timePoint.tv_nsec = (unsigned long long) timePoint.tv_nsec + nanoseconds - NANOSECONDS_IN_SECOND;
+		++timePoint.tv_sec;
+	}
 
 	return timePoint;
 }
