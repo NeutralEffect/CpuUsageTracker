@@ -18,6 +18,9 @@ int CondVar_notifyAll(CondVarHandle_t cv);
 int CondVar_waitMs(CondVarHandle_t cv, MutexHandle_t mtx, unsigned ms);
 
 
+int CondVar_waitUntil(CondVarHandle_t cv, MutexHandle_t mtx, const struct timespec* timePoint);
+
+
 /**
  * \brief Attempts to lock mutex either until successful or specified amount of time has passed.
  * \param mutex Mutex to be locked.

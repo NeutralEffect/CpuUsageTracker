@@ -2,42 +2,10 @@
 #include <threads.h>
 #include <stdatomic.h>
 #include "logger.h"
-
-
-#define NANOSECONDS_IN_SECOND 1000000000u
+#include "helpers.h"
 
 
 static volatile atomic_bool g_killSwitch = false;
-
-
-/**
- * \brief Converts duration in milliseconds into time point relative to current time.
- * \param ms Milliseconds to convert.
- * \return Time point when given amount of milliseconds from now on will pass.
-*/
-static struct timespec durationMsToTimespecPoint(unsigned ms)
-{
-	struct timespec timePoint;
-	timespec_get(&timePoint, TIME_UTC);
-	unsigned long long seconds = ms / 1000;
-	// Can be replaced with formula: (ms % 1000) * 1000000
-	unsigned long long nanoseconds = (ms - (seconds * 1000)) * 1000000;
-	timePoint.tv_sec += seconds;
-	// Check for nanoseconds overflow
-	if (timePoint.tv_nsec + nanoseconds < NANOSECONDS_IN_SECOND)
-	{
-		// No overflow, proceed as usual
-		timePoint.tv_nsec += nanoseconds;
-	}
-	else
-	{
-		// Overflow, adjust for carry-over
-		timePoint.tv_nsec = (unsigned long long) timePoint.tv_nsec + nanoseconds - NANOSECONDS_IN_SECOND;
-		++timePoint.tv_sec;
-	}
-
-	return timePoint;
-}
 
 
 int CondVar_notify(CondVarHandle_t cv)
@@ -59,9 +27,20 @@ int CondVar_waitMs(CondVarHandle_t cv, MutexHandle_t mtx, unsigned ms)
 		return thrd_error;
 	}
 
-	const struct timespec timePoint = durationMsToTimespecPoint(ms);
+	const struct timespec timePoint = TimePointMs(ms);
 
 	return cnd_timedwait(cv, mtx, &timePoint);
+}
+
+
+int CondVar_waitUntil(CondVarHandle_t cv, MutexHandle_t mtx, const struct timespec* timePoint)
+{
+	if ( (NULL == cv) || (NULL == mtx) )
+	{
+		return thrd_error;
+	}
+
+	return cnd_timedwait(cv, mtx, timePoint);
 }
 
 
@@ -78,7 +57,7 @@ int Mutex_tryLockMs(MutexHandle_t mutex, unsigned waitTimeMs)
 		return thrd_error;
 	}
 
-	struct timespec timePoint = durationMsToTimespecPoint(waitTimeMs);
+	struct timespec timePoint = TimePointMs(waitTimeMs);
 	
 	return mtx_timedlock(mutex, &timePoint);
 }

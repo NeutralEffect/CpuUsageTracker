@@ -104,6 +104,7 @@ int main()
 	int readerResult;
 	int analyzerResult;
 	int printerResult;
+	
 	thrd_join(printerThrd, &printerResult);
 	thrd_join(analyzerThrd, &analyzerResult);
 	thrd_join(readerThrd, &readerResult);

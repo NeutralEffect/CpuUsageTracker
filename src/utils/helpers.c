@@ -1,10 +1,13 @@
-#include "file.h"
+#include "helpers.h"
 #include <stdio.h>
 #include <limits.h>
 #include "logger.h"
 
 
-int File_readContentInto(const char* fileName, char* bufPtr, size_t bufSz)
+#define NANOSECONDS_IN_SECOND 1000000000u
+
+
+int ReadFileContent(const char* fileName, char* bufPtr, size_t bufSz)
 {
 	if (NULL == fileName)
 	{
@@ -70,4 +73,29 @@ int File_readContentInto(const char* fileName, char* bufPtr, size_t bufSz)
 	// otherwise return INT_MAX to indicate the content is longer than maximum size of int
 	int retval = (INT_MAX > bytesRead) ? bytesRead : INT_MAX;
 	return retval;
+}
+
+
+struct timespec TimePointMs(unsigned ms)
+{
+	struct timespec timePoint;
+	timespec_get(&timePoint, TIME_UTC);
+	unsigned long long seconds = ms / 1000;
+	// Can be replaced with formula: (ms % 1000) * 1000000
+	unsigned long long nanoseconds = (ms - (seconds * 1000)) * 1000000;
+	timePoint.tv_sec += seconds;
+	// Check for nanoseconds overflow
+	if (timePoint.tv_nsec + nanoseconds < NANOSECONDS_IN_SECOND)
+	{
+		// No overflow, proceed as usual
+		timePoint.tv_nsec += nanoseconds;
+	}
+	else
+	{
+		// Overflow, adjust for carry-over
+		timePoint.tv_nsec = (unsigned long long) timePoint.tv_nsec + nanoseconds - NANOSECONDS_IN_SECOND;
+		++timePoint.tv_sec;
+	}
+
+	return timePoint;
 }

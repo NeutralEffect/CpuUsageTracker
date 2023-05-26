@@ -1,10 +1,15 @@
-/**
- * \file file.h
- * File system access.
-*/
-#ifndef FILE_H_INCLUDED
-#define FILE_H_INCLUDED
+#ifndef HELPERS_H_INCLUDED
+#define HELPERS_H_INCLUDED
+#include <time.h>
 #include <stddef.h>
+
+
+/**
+ * \brief Converts duration in milliseconds into time point relative to current UTC time.
+ * \param ms Amount of time for resulting time point to be shifted forward by, in milliseconds.
+ * \return Time point when given amount of milliseconds from now on will pass.
+*/
+struct timespec TimePointMs(unsigned ms);
 
 
 /**
@@ -17,7 +22,7 @@
  * or INT_MAX if that amount is equal to or greater than INT_MAX.
  * Otherwise, a negative integer will be returned.
 */
-int File_readContentInto(const char* fileName, char* bufPtr, size_t bufSz);
+int ReadFileContent(const char* fileName, char* bufPtr, size_t bufSz);
 
 
-#endif // !FILE_H_INCLUDED
+#endif // !HELPERS_H_INCLUDED

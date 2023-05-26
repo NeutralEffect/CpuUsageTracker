@@ -1,6 +1,6 @@
 #include "procstat.h"
 #include "logger.h"
-#include "file.h"
+#include "helpers.h"
 #include "cpucount.h"
 #include <string.h>
 #include <stdlib.h>
@@ -117,7 +117,7 @@ ProcStat_t* ProcStat_loadFromFile(void)
 	const size_t fBufSz = sizeof fBuf / sizeof *fBuf;
 
 	// Either no data has been read or error has occured, abort
-	if (File_readContentInto(FILE_PATH, fBuf, fBufSz) < 1)
+	if (ReadFileContent(FILE_PATH, fBuf, fBufSz) < 1)
 	{
 		return NULL;
 	}

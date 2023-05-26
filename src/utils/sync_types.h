@@ -3,8 +3,8 @@
 #include <threads.h>
 
 
-typedef mtx_t* MutexHandle_t;
 typedef cnd_t* CondVarHandle_t;
+typedef mtx_t* MutexHandle_t;
 
 
 #endif // !SYNC_TYPES_H_INCLUDED

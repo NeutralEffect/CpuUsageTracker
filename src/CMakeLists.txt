@@ -12,7 +12,7 @@ target_sources(${PROJECT_NAME}
 		${CMAKE_CURRENT_SOURCE_DIR}/threads/watchdog.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/cpucount.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/cpuusage.c
-		${CMAKE_CURRENT_SOURCE_DIR}/utils/file.c
+		${CMAKE_CURRENT_SOURCE_DIR}/utils/helpers.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/procstat.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/sighandlers.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/sync.c
