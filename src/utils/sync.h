@@ -2,8 +2,8 @@
  * \file thread_utils.h
  * Thread synchronization, communication and management utilities.
 */
-#ifndef THREAD_UTILS_H_INCLUDED
-#define THREAD_UTILS_H_INCLUDED
+#ifndef SYNC_H_INCLUDED
+#define SYNC_H_INCLUDED
 #include "sync_types.h"
 #include <stdbool.h>
 #include <threads.h>
@@ -97,4 +97,4 @@ int Thread_sleep(unsigned seconds);
 int Thread_sleepMs(unsigned milliseconds);
 
 
-#endif // !THREAD_UTILS_H_INCLUDED
+#endif // !SYNC_H_INCLUDED
