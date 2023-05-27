@@ -1,3 +1,7 @@
+/**
+ * \file helpers.h
+ * Standalone helper functions used in multiple places throughout program.
+*/
 #ifndef HELPERS_H_INCLUDED
 #define HELPERS_H_INCLUDED
 #include <time.h>
