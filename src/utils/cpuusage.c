@@ -12,9 +12,11 @@
 */
 static PercentageValue_t calculateCpuUsagePercentage(const CpuStat_t* oldStat, const CpuStat_t* newStat)
 {
+	static const double ERROR_VAL = -1.0;
+
 	if ((NULL == oldStat) || (NULL == newStat))
 	{
-		return 0;
+		return ERROR_VAL;
 	}
 
 	CpuStatValue_t prevIdle = oldStat->values[CSINDEX_IDLE] + oldStat->values[CSINDEX_IOWAIT];
@@ -42,7 +44,7 @@ static PercentageValue_t calculateCpuUsagePercentage(const CpuStat_t* oldStat, c
 	CpuStatValue_t totald = total - prevTotal;
 	CpuStatValue_t idled = idle - prevIdle;
 
-	PercentageValue_t result = ((double) totald - idled) / totald;
+	PercentageValue_t result = (totald != 0.0) ? ((double) totald - idled) / totald : ERROR_VAL;
 	// Adjust from fraction to percentage
 	return result * 100.0;
 }
