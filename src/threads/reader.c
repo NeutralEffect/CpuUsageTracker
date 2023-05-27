@@ -52,14 +52,14 @@ int ReaderThread(void* rawParams)
 		if (NULL == procStat)
 		{
 			// Procstat is unavailable, log error and try again in next iteration
-			Log(LLEVEL_ERROR, "reader: cannot load data from /proc/stat file");
+			Log(LLEVEL_ERROR, "cannot load data from /proc/stat file");
 			continue;
 		}
 
 		// Procstat has been acquired, lock mutex on circular buffer and write
 		if (thrd_success != Mutex_tryLockMs(params->outMtx, READER_MUTEX_WAIT_TIME_MS))
 		{
-			Log(LLEVEL_WARNING, "reader: couldn't acquire buffer mutex");
+			Log(LLEVEL_WARNING, "couldn't acquire buffer mutex");
 			continue;
 		}
 
@@ -72,17 +72,17 @@ int ReaderThread(void* rawParams)
 
 			if (thrd_success == result)
 			{
-				Log(LLEVEL_DEBUG, "reader: received notification on condition variable");
+				Log(LLEVEL_DEBUG, "received notification on input not full condition variable");
 				break;
 			}
 			else if (thrd_timedout == result)
 			{
-				Log(LLEVEL_WARNING, "reader: timeout while waiting on condition variable");
+				Log(LLEVEL_WARNING, "timeout while waiting on input not full condition variable");
 				break;
 			}
 			else
 			{
-				Log(LLEVEL_ERROR, "reader: error while waiting on condition variable");
+				Log(LLEVEL_ERROR, "error while waiting on input not full condition variable");
 			}
 
 		}
@@ -91,7 +91,7 @@ int ReaderThread(void* rawParams)
 		{
 			if (thrd_success != Mutex_unlock(params->outMtx))
 			{
-				Log(LLEVEL_ERROR, "reader: couldn't release buffer mutex");
+				Log(LLEVEL_ERROR, "couldn't release input buffer mutex");
 			}
 			break;
 		}
@@ -102,17 +102,17 @@ int ReaderThread(void* rawParams)
 		// Unlock mutex so analyzer thread can access it
 		if (thrd_success != Mutex_unlock(params->outMtx))
 		{
-			Log(LLEVEL_ERROR, "reader: couldn't release buffer mutex");
+			Log(LLEVEL_ERROR, "couldn't release input buffer mutex");
 		}
 
 		// Signal to analyzer that data is available
 		if (thrd_success != CondVar_notify(params->outNotEmptyCv))
 		{
-			Log(LLEVEL_ERROR, "reader: couldn't notify on condition variable");
+			Log(LLEVEL_ERROR, "couldn't notify on input not empty condition variable");
 		}
 		
-		Log(LLEVEL_DEBUG, "reader: procstat data sent");
-		Log(LLEVEL_TRACE, "reader: cpu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
+		Log(LLEVEL_DEBUG, "procstat data sent");
+		Log(LLEVEL_TRACE, "raw data: %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu ", 
 			procStat->cpuStats[0].values[0],
 			procStat->cpuStats[0].values[1],
 			procStat->cpuStats[0].values[2],
