@@ -7,21 +7,6 @@
 
 
 /**
- * Thread identifiers used for activity reporting.
-*/
-typedef enum ThreadId
-{
-	TID_READER = 0,
-	TID_ANALYZER,
-	TID_PRINTER,
-	TID_LOGGER,
-	TID_WATCHDOG,
-	TID_COUNT_
-}
-ThreadId_t;
-
-
-/**
  * \brief Initializes watchdog module.
  * Has to be called before any function in this module is used.
 */
@@ -33,7 +18,7 @@ void Watchdog_init(void);
  * given thread, as program uses those reports to detect unresponsive threads.
  * \param threadId Identifier of reporting thread.
 */
-void Watchdog_reportActive(ThreadId_t threadId);
+void Watchdog_reportActive(void);
 
 
 /**

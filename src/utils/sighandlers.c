@@ -1,5 +1,5 @@
 #include "sighandlers.h"
-#include "sync.h"
+#include "threadctl.h"
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>

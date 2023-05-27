@@ -16,4 +16,5 @@ target_sources(${PROJECT_NAME}
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/procstat.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/sighandlers.c
 		${CMAKE_CURRENT_SOURCE_DIR}/utils/sync.c
+		${CMAKE_CURRENT_SOURCE_DIR}/utils/threadctl.c
 )

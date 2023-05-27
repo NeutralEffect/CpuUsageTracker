@@ -1,11 +1,7 @@
 #include "sync.h"
 #include <threads.h>
-#include <stdatomic.h>
 #include "logger.h"
 #include "helpers.h"
-
-
-static volatile atomic_bool g_killSwitch = false;
 
 
 int CondVar_notify(CondVarHandle_t cv)
@@ -66,62 +62,4 @@ int Mutex_tryLockMs(MutexHandle_t mutex, unsigned waitTimeMs)
 int Mutex_unlock(MutexHandle_t mutex)
 {
 	return mtx_unlock(mutex);
-}
-
-
-void Thread_activateKillSwitch()
-{
-	g_killSwitch = true;
-}
-
-
-bool Thread_getKillSwitchStatus(void)
-{
-	return g_killSwitch;
-}
-
-
-void Thread_forceSleep(unsigned seconds)
-{
-	Thread_forceSleepMs(seconds * 1000u);
-}
-
-
-void Thread_forceSleepMs(unsigned milliseconds)
-{
-	time_t secs = milliseconds / 1000u;
-	unsigned long long nsecs = (milliseconds - (secs * 1000)) * 1000000;
-	struct timespec sleepTime = { .tv_sec = secs, .tv_nsec = nsecs };
-	
-	int result;
-
-	do
-	{
-		result = thrd_sleep(&sleepTime, &sleepTime);
-
-		if (-1 == result)
-		{
-			Log(LLEVEL_WARNING, "thread sleep interrupted");
-		}
-		else
-		{
-			Log(LLEVEL_ERROR, "error encountered while attempting to sleep");
-		}
-
-	} while (0 != result);
-	
-}
-
-
-int Thread_sleep(unsigned seconds)
-{
-	return thrd_sleep(&(struct timespec) { .tv_sec = seconds, .tv_nsec = 0 }, NULL);
-}
-
-
-int Thread_sleepMs(unsigned milliseconds)
-{
-	time_t secs = milliseconds / 1000u;
-	unsigned long long nsecs = (milliseconds - (secs * 1000)) * 1000000;
-	return thrd_sleep(&(struct timespec) { .tv_sec = secs, .tv_nsec = nsecs }, NULL);
 }
