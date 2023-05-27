@@ -1,15 +1,25 @@
 #include "watchdog.h"
 #include "sync.h"
 #include "logger.h"
+#include "threadctl.h"
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 
-#define MAX_UNRESPONSIVE_TIME_SECONDS 2u
-#define SLEEP_TIME_MILLISECONDS 500u
-#define MUTEX_WAIT_TIME_MS 50u
+#define WATCHDOG_ALLOWED_UNRESPONSIVE_SECONDS 	2u
+#define WATCHDOG_MUTEX_WAIT_TIME_MS 			50u
+#define WATCHDOG_SLEEP_TIME_MILLISECONDS		1000
+#define WATCHDOG_THREAD_ID						TID_WATCHDOG
+#define WATCHDOG_THREAD_NAME					"Watchdog"
+
+
+static ThreadInfo_t g_watchdogThreadInfo =
+{
+	.tid 	= WATCHDOG_THREAD_ID,
+	.name 	= WATCHDOG_THREAD_NAME
+};
 
 
 static volatile struct timespec g_activityReports[TID_COUNT_];
@@ -58,14 +68,21 @@ void Watchdog_init(void)
 }
 
 
-void Watchdog_reportActive(ThreadId_t threadIndex)
+void Watchdog_reportActive(void)
 {
 	static const unsigned MAX_LOCK_TIME_MS = 50u;
+
+	const ThreadInfo_t* thrdInfo = ThreadInfo_get();
+
+	if (NULL == thrdInfo)
+	{
+		return;
+	}
 
 	if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, MAX_LOCK_TIME_MS))
 	{
 		// We need to discard the volatile qualifier; it is safe to do so since we're mutex-locked.
-		clock_gettime(CLOCK_REALTIME, (struct timespec*) &g_activityReports[threadIndex]);
+		clock_gettime(CLOCK_REALTIME, (struct timespec*) &g_activityReports[thrdInfo->tid]);
 
 		// It's possible for error to arise while unlocking mutex,
 		// but handling it here is unproductive.
@@ -83,6 +100,14 @@ int WatchdogThread(void* rawParams)
 	// Suppress unused parameter warning
 	(void) rawParams;
 
+	int retval = 0;
+
+	if (thrd_success != ThreadInfo_set(&g_watchdogThreadInfo))
+	{
+		retval = -1;
+		thrd_exit(retval);
+	}
+
 	static const char* THREAD_NAMES[TID_COUNT_] =
 	{
 		[TID_READER]	= "Reader",
@@ -94,7 +119,7 @@ int WatchdogThread(void* rawParams)
 
 	// Initialize activity reports with current time value
 	// to prevent them from being instantly recognized as unresponsive
-	if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, MUTEX_WAIT_TIME_MS))
+	if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, WATCHDOG_MUTEX_WAIT_TIME_MS))
 	{
 		struct timespec now;
 		clock_gettime(CLOCK_REALTIME, &now);
@@ -106,24 +131,24 @@ int WatchdogThread(void* rawParams)
 		
 		if (thrd_success != Mutex_unlock(&g_activityReportsMutex))
 		{
-			Log(LLEVEL_ERROR, "watchdog: cannot release mutex");
+			Log(LLEVEL_ERROR, "cannot release mutex");
 		}
 	}
 
 	while (!Thread_getKillSwitchStatus())
 	{
-		Watchdog_reportActive(TID_WATCHDOG);
+		Watchdog_reportActive();
 		
 		struct timespec reportsCopy[TID_COUNT_];
 
-		if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, MUTEX_WAIT_TIME_MS))
+		if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, WATCHDOG_MUTEX_WAIT_TIME_MS))
 		{
 			// Discard volatile on g_activityReports since we're mutex-locked.
 			memcpy(reportsCopy, (void*) g_activityReports, sizeof(g_activityReports));
 			
 			if (thrd_success != Mutex_unlock(&g_activityReportsMutex))
 			{
-				Log(LLEVEL_ERROR, "watchdog: cannot release mutex");
+				Log(LLEVEL_ERROR, "cannot release mutex");
 			}
 		}
 
@@ -135,24 +160,26 @@ int WatchdogThread(void* rawParams)
 		for (int ii = 0; ii < TID_COUNT_; ++ii)
 		{
 			struct timespec diff = timespecDifference(now, reportsCopy[ii]);
-			if (diff.tv_sec > MAX_UNRESPONSIVE_TIME_SECONDS)
+			if (diff.tv_sec > WATCHDOG_ALLOWED_UNRESPONSIVE_SECONDS)
 			{
 				++unresponsiveThreads;
-				Log(LLEVEL_FATAL, "watchdog: thread \"%s\" is unresponsive", THREAD_NAMES[ii]);
+				Log(LLEVEL_FATAL, "thread \"%s\" is unresponsive", THREAD_NAMES[ii]);
 			}
 		}
 
 		if (unresponsiveThreads > 0)
 		{
-			Log(LLEVEL_FATAL, "watchdog: terminating program due to unresponsive threads");
+			Log(LLEVEL_FATAL, "terminating program due to unresponsive threads");
 			system("clear");
 			printf("Unresponsive threads, terminating program...\n");
 			triggerKillswitch();
 			break;
 		}
 
-		Thread_sleepMs(SLEEP_TIME_MILLISECONDS);
+		Thread_sleepMs(WATCHDOG_SLEEP_TIME_MILLISECONDS);
 	}
 
-	thrd_exit(0);
+	Log(LLEVEL_INFO, "thread exiting");
+
+	thrd_exit(retval);
 }

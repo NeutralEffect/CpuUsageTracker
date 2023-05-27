@@ -1,228 +1,247 @@
 #include "analyzer.h"
 #include "sync.h"
 #include "procstat.h"
-#include "stdlib.h"
+#include "circbuf.h"
 #include "cpuusage.h"
 #include "logger.h"
+#include "helpers.h"
 #include "watchdog.h"
+#include "threadctl.h"
+#include <stdlib.h>
 #include <string.h>
 #include <threads.h>
+#include <stdbool.h>
 
 
-#define SLEEP_TIME_SECONDS 1
-#define MUTEX_WAIT_TIME_MS 50
+#define ANALYZER_MUTEX_WAIT_TIME_MS 	50
+#define ANALYZER_CONDVAR_WAIT_TIME_MS 	2000
+#define ANALYZER_THREAD_ID				TID_ANALYZER
+#define ANALYZER_THREAD_NAME			"Analyzer"
 
 
-/**
- * \brief Repeatedly attempt to read from given circular buffer
- * until either data is read or thread has been interrupted.
- * \param mutex Mutex to lock on before reading from circular buffer.
- * \param cbuf Circular buffer to read data from.
- * \param output Buffer to write resulting data into.
- * \return 0 if successful, negative value on error.
-*/
-static int waitForData(mtx_t* mutex, CircularBuffer_t* cbuf, void* output)
+static ThreadInfo_t g_analyzerThreadInfo =
 {
-	int result = 0;
-
-	while (true) 
-	{
-		const int mtxstatus = Mutex_tryLockMs(mutex, MUTEX_WAIT_TIME_MS);
-
-		if (thrd_success == mtxstatus)
-		{
-			bool dataReceived = CircularBuffer_read(cbuf, output);
-			
-			if (thrd_success != Mutex_unlock(mutex))
-			{
-				result = -1;
-				break;
-			}
-
-			if (dataReceived)
-			{
-				break;
-			}
-		}
-		else if (thrd_error == mtxstatus)
-		{
-			Log(LLEVEL_ERROR, "cannot acquire mutex");
-			result = -1;
-			break;
-		}
-
-		Thread_sleep(SLEEP_TIME_SECONDS);
-	}
-
-	return result;
-}
-
-
-/**
- * \brief Attempts to safely read one item from given circular buffer,
- * waiting no longer than specified amount of time for mutex to be locked.
- * \param mutex Mutex to lock on while reading from circular buffer.
- * \param cbuf Circular buffer to read item from.
- * \param output Output buffer for item to be saved into.
- * \param timeoutMs Maximum amount of time to be spent waiting for mutex to unlock, in milliseconds.
- * \return 0 if successful, 1 in case of timeout, negative value on error.
-*/
-static int readDataTimeout(mtx_t* mutex, CircularBuffer_t* cbuf, void* output, unsigned timeoutMs)
-{
-	const int mtxlockres = Mutex_tryLockMs(mutex, timeoutMs);
-	int result = 0;
-
-	if (thrd_success != mtxlockres)
-	{
-		result = (thrd_timedout == mtxlockres) ? -1 : -2;
-		// Since we didn't obrain mutex, we cannot proceed with reading from buffer
-		return result;
-	}
-
-	if (!CircularBuffer_read(cbuf, output))
-	{
-		result = 1;
-	}
-
-	if (thrd_success != Mutex_unlock(mutex))
-	{
-		result = -4;
-	}
-
-	return result;
-}
+	.tid 	= ANALYZER_THREAD_ID,
+	.name 	= ANALYZER_THREAD_NAME
+};
 
 
 int AnalyzerThread(void* rawParams)
 {
-	int returnCode = 0;
+	int retval = 0;
 
 	if (NULL == rawParams)
 	{
-		returnCode = -1;
+		retval = -1;
 		goto error_exit_1;
 	}
 
-	AnalyzerThreadParams_t* params = (AnalyzerThreadParams_t*) rawParams;
+	if (thrd_success != ThreadInfo_set(&g_analyzerThreadInfo))
+	{
+		retval = -2;
+		goto error_exit_1;
+	}
+
+	AnalyzerThreadParams_t* const params = (AnalyzerThreadParams_t*) rawParams;
 	ProcStat_t* oldStatBuffer = malloc(ProcStat_size());
 	ProcStat_t* newStatBuffer = malloc(ProcStat_size());
 	CpuUsageInfo_t* const usageInfoBuffer = malloc(CpuUsageInfo_size());
+	bool oldStatBufferInitialized = false;
 
 	if (NULL == oldStatBuffer)
 	{
-		returnCode = -2;
+		retval = -3;
 		goto error_exit_1;
 	}
 
 	if (NULL == newStatBuffer)
 	{
-		returnCode = -2;
+		retval = -3;
 		goto error_exit_2;
 	}
 
 	if (NULL == usageInfoBuffer)
 	{
-		returnCode = -2;
+		retval = -3;
 		goto error_exit_3;
 	}
-
-	while (
-		(0 != waitForData(params->inMtx, params->inBuf, oldStatBuffer)) &&
-		(false == Thread_getKillSwitchStatus()))
-	{
-		Watchdog_reportActive(TID_ANALYZER);
-	}
-
-	Log(LLEVEL_DEBUG, "analyzer: procstat data received");
-	Log(LLEVEL_TRACE, "analyzer: cpu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
-		oldStatBuffer->cpuStats[0].values[0],
-		oldStatBuffer->cpuStats[0].values[1],
-		oldStatBuffer->cpuStats[0].values[2],
-		oldStatBuffer->cpuStats[0].values[3],
-		oldStatBuffer->cpuStats[0].values[4],
-		oldStatBuffer->cpuStats[0].values[5],
-		oldStatBuffer->cpuStats[0].values[6],
-		oldStatBuffer->cpuStats[0].values[7],
-		oldStatBuffer->cpuStats[0].values[8],
-		oldStatBuffer->cpuStats[0].values[9]);
 
 	// Main loop
 	while (false == Thread_getKillSwitchStatus())
 	{
-		Watchdog_reportActive(TID_ANALYZER);
+		Watchdog_reportActive();
 
-		const int dataReadStatus = readDataTimeout(params->inMtx, params->inBuf, newStatBuffer, MUTEX_WAIT_TIME_MS);
-
-		switch (dataReadStatus)
+		// Acquire mutex to receive data from reader thread
+		if (thrd_success != Mutex_tryLockMs(params->inMtx, ANALYZER_MUTEX_WAIT_TIME_MS))
 		{
-			case 0:
+			Log(LLEVEL_WARNING, "couldn't acquire input buffer mutex");
+			continue;
+		}
+
+		struct timespec timePoint = TimePointMs(ANALYZER_CONDVAR_WAIT_TIME_MS);
+		while ( CircularBuffer_isEmpty(params->inBuf) && (false == Thread_getKillSwitchStatus()) )
+		{
+			int result = CondVar_waitUntil(params->inNotEmptyCv, params->inMtx, &timePoint);
+
+			if (thrd_success == result)
 			{
-				CpuUsageInfo_calculate(oldStatBuffer, newStatBuffer, usageInfoBuffer);
-
-				if (thrd_success == Mutex_tryLockMs(params->outMtx, MUTEX_WAIT_TIME_MS))
-				{
-					memcpy(params->outBuf, usageInfoBuffer, CpuUsageInfo_size());
-					Mutex_unlock(params->outMtx);
-					Log(LLEVEL_DEBUG, "analyzer: usage stats sent");
-				}
-
-				Log(LLEVEL_TRACE, "analyzer old: %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
-					oldStatBuffer->cpuStats[0].values[0],
-					oldStatBuffer->cpuStats[0].values[1],
-					oldStatBuffer->cpuStats[0].values[2],
-					oldStatBuffer->cpuStats[0].values[3],
-					oldStatBuffer->cpuStats[0].values[4],
-					oldStatBuffer->cpuStats[0].values[5],
-					oldStatBuffer->cpuStats[0].values[6],
-					oldStatBuffer->cpuStats[0].values[7],
-					oldStatBuffer->cpuStats[0].values[8],
-					oldStatBuffer->cpuStats[0].values[9]);
-
-				Log(LLEVEL_TRACE, "analyzer new: %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
-					newStatBuffer->cpuStats[0].values[0],
-					newStatBuffer->cpuStats[0].values[1],
-					newStatBuffer->cpuStats[0].values[2],
-					newStatBuffer->cpuStats[0].values[3],
-					newStatBuffer->cpuStats[0].values[4],
-					newStatBuffer->cpuStats[0].values[5],
-					newStatBuffer->cpuStats[0].values[6],
-					newStatBuffer->cpuStats[0].values[7],
-					newStatBuffer->cpuStats[0].values[8],
-					newStatBuffer->cpuStats[0].values[9]);
-
-				// Swap buffer pointers, so that in next iteration fresh data will overwrite oldest data
-				ProcStat_t* tmp = oldStatBuffer;
-				oldStatBuffer = newStatBuffer;
-				newStatBuffer = tmp;
+				Log(LLEVEL_DEBUG, "received notification on input condition variable");
+				break;
 			}
-			break;
-
-			case 1:
+			else if (thrd_timedout == result)
 			{
-				Log(LLEVEL_INFO, "analyzer: procstat data unavailable");
+				Log(LLEVEL_WARNING, "timeout while waiting on input condition variable");
+				break;
 			}
-			break;
-
-			default:
+			else
 			{
-				Log(LLEVEL_ERROR, "analyzer: error while attempting to receive procstat data");
+				Log(LLEVEL_ERROR, "error while waiting on input condition variable");
+			}
+		}
+		
+		if (Thread_getKillSwitchStatus())
+		{
+			if (thrd_success != Mutex_unlock(params->inMtx))
+			{
+				Log(LLEVEL_ERROR, "couldn't release input buffer mutex");
 			}
 			break;
 		}
 
-		Thread_sleep(SLEEP_TIME_SECONDS);
+		if (!CircularBuffer_read(params->inBuf, newStatBuffer))
+		{
+			Log(LLEVEL_ERROR, "attempted read from empty buffer");
+			
+			if (thrd_success != Mutex_unlock(params->inMtx))
+			{
+				Log(LLEVEL_ERROR, "couldn't release input buffer mutex");
+			}
+
+			continue;
+		}
+
+		if (thrd_success != Mutex_unlock(params->inMtx))
+		{
+			Log(LLEVEL_ERROR, "couldn't release input buffer mutex");
+			continue;
+		}
+
+		if (thrd_success != CondVar_notify(params->inNotFullCv))
+		{
+			Log(LLEVEL_ERROR, "couldn't notify on input condition variable");
+		}
+
+		if (!oldStatBufferInitialized)
+		{
+			ProcStat_t* tmp 			= oldStatBuffer;
+			oldStatBuffer 				= newStatBuffer;
+			newStatBuffer 				= tmp;
+			oldStatBufferInitialized 	= true;
+			continue;
+		}
+
+		CpuUsageInfo_calculate(oldStatBuffer, newStatBuffer, usageInfoBuffer);
+
+		if (thrd_success != Mutex_tryLockMs(params->outMtx, ANALYZER_MUTEX_WAIT_TIME_MS))
+		{
+			Log(LLEVEL_WARNING, "couldn't acquire output buffer mutex");
+			continue;
+		}
+
+		// Wait and write to output buffer
+		timePoint = TimePointMs(ANALYZER_CONDVAR_WAIT_TIME_MS);
+		while (CircularBuffer_isFull(params->outBuf) && (false == Thread_getKillSwitchStatus()))
+		{
+			int result = CondVar_waitUntil(params->outNotFullCv, params->outMtx, &timePoint);
+
+			if (thrd_success == result)
+			{
+				Log(LLEVEL_DEBUG, "received notification on output condition variable");
+				break;
+			}
+			else if (thrd_timedout == result)
+			{
+				Log(LLEVEL_WARNING, "timeout while waiting on output condition variable");
+				break;
+			}
+			else
+			{
+				Log(LLEVEL_ERROR, "error while waiting on output condition variable");
+			}
+			
+		}
+
+		if (Thread_getKillSwitchStatus())
+		{
+			if (thrd_success != Mutex_unlock(params->outMtx))
+			{
+				Log(LLEVEL_ERROR, "couldn't release output buffer mutex");
+			}
+			break;
+		}
+
+		CircularBuffer_write(params->outBuf, usageInfoBuffer);
+
+		if (thrd_success != Mutex_unlock(params->outMtx))
+		{
+			Log(LLEVEL_ERROR, "couldn't release output buffer mutex");
+			continue;
+		}
+
+		if (thrd_success != CondVar_notify(params->outNotEmptyCv))
+		{
+			Log(LLEVEL_ERROR, "couldn't notify on output condition variable");
+		}
+		else
+		{
+			Log(LLEVEL_DEBUG, "notification sent on output condition variable");
+		}
+
+		Log(LLEVEL_TRACE, "old data: %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
+			oldStatBuffer->cpuStats[0].values[0],
+			oldStatBuffer->cpuStats[0].values[1],
+			oldStatBuffer->cpuStats[0].values[2],
+			oldStatBuffer->cpuStats[0].values[3],
+			oldStatBuffer->cpuStats[0].values[4],
+			oldStatBuffer->cpuStats[0].values[5],
+			oldStatBuffer->cpuStats[0].values[6],
+			oldStatBuffer->cpuStats[0].values[7],
+			oldStatBuffer->cpuStats[0].values[8],
+			oldStatBuffer->cpuStats[0].values[9]);
+
+		Log(LLEVEL_TRACE, "new data: %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu", 
+			newStatBuffer->cpuStats[0].values[0],
+			newStatBuffer->cpuStats[0].values[1],
+			newStatBuffer->cpuStats[0].values[2],
+			newStatBuffer->cpuStats[0].values[3],
+			newStatBuffer->cpuStats[0].values[4],
+			newStatBuffer->cpuStats[0].values[5],
+			newStatBuffer->cpuStats[0].values[6],
+			newStatBuffer->cpuStats[0].values[7],
+			newStatBuffer->cpuStats[0].values[8],
+			newStatBuffer->cpuStats[0].values[9]);
+
+		Log(LLEVEL_TRACE, "result: %.2f", usageInfoBuffer->values[0]);
+
+		// Swap local incoming data buffer pointers so that in the next iteration, old data is overwritten
+		ProcStat_t* tmp = oldStatBuffer;
+		oldStatBuffer 	= newStatBuffer;
+		newStatBuffer 	= tmp;
 	}
+
+	Log(LLEVEL_INFO, "thread exiting");
 
 	free(newStatBuffer);
 	free(oldStatBuffer);
 	free(usageInfoBuffer);
+	
 	// Exit as usual
-	thrd_exit(returnCode);
+	thrd_exit(retval);
 
 error_exit_3:
 	free(newStatBuffer);
 error_exit_2:
 	free(oldStatBuffer);
 error_exit_1:
-	thrd_exit(returnCode);
+	thrd_exit(retval);
 }

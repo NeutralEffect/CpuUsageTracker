@@ -3,14 +3,26 @@
 #include "cpuusage.h"
 #include "logger.h"
 #include "watchdog.h"
+#include "circbuf.h"
+#include "helpers.h"
+#include "threadctl.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 
-#define SLEEP_TIME_SECONDS 1
-#define MUTEX_WAIT_TIME_MS 50
-#define PERCENTAGE_VALUE_FORMAT "%.2f"
+#define PRINTER_CONDVAR_WAIT_TIME_MS 	2000
+#define PRINTER_MUTEX_WAIT_TIME_MS 		50
+#define PERCENTAGE_VALUE_FORMAT 		"%.2f"
+#define PRINTER_THREAD_ID 				TID_PRINTER
+#define PRINTER_THREAD_NAME 			"Printer"
+
+
+static ThreadInfo_t g_printerThreadInfo =
+{
+	.tid 	= PRINTER_THREAD_ID,
+	.name 	= PRINTER_THREAD_NAME
+};
 
 
 static void printFormattedCpuUsage(const CpuUsageInfo_t* cuinfo)
@@ -33,82 +45,91 @@ static void printFormattedCpuUsage(const CpuUsageInfo_t* cuinfo)
 
 int PrinterThread(void* rawParams)
 {
-	int returnCode = 0;
-	PrinterThreadParams_t* params = (PrinterThreadParams_t*) rawParams;
+	int retval = 0;
 
 	if (NULL == rawParams)
 	{
-		returnCode = -1;
+		retval = -1;
 		goto error_exit_1;
 	}
 
+	if (thrd_success != ThreadInfo_set(&g_printerThreadInfo))
+	{
+		retval = -2;
+		goto error_exit_1;
+	}
+
+	PrinterThreadParams_t* params = (PrinterThreadParams_t*) rawParams;
+
 	CpuUsageInfo_t* usageInfoBuffer = malloc(CpuUsageInfo_size());
-	usageInfoBuffer->values[0] = 299.0; // FIXME
 
 	if (NULL == usageInfoBuffer)
 	{
-		returnCode = -2;
+		retval = -3;
 		goto error_exit_1;
 	}
 
 	while (false == Thread_getKillSwitchStatus())
 	{
-		Watchdog_reportActive(TID_PRINTER);
+		Watchdog_reportActive();
 
-		int mtxstatus = Mutex_tryLockMs(params->inMtx, MUTEX_WAIT_TIME_MS);
-
-		switch (mtxstatus)
+		if (thrd_success != Mutex_tryLockMs(params->inMtx, PRINTER_MUTEX_WAIT_TIME_MS))
 		{
-			case thrd_success:
+			Log(LLEVEL_WARNING, "couldn't acquire input buffer mutex");
+			continue;
+		}
+
+		struct timespec timePoint = TimePointMs(PRINTER_CONDVAR_WAIT_TIME_MS);
+		while (CircularBuffer_isEmpty(params->inBuf) && (false == Thread_getKillSwitchStatus()))
+		{
+			int result = CondVar_waitUntil(params->inNotEmptyCv, params->inMtx, &timePoint);
+
+			if (thrd_success == result)
 			{
-				bool newValuesRead = false;
-				// In order to prevent reading the same information multiple times,
-				// we overwrite valuesLength to indicate that it is no longer valid.
-				// Since only this code will ever read from that buffer
-				// and it will never be assigned non-positive value outside of this block
-				// it's a safe way of ensuring that we don't consume the same values more than once.
-				// However, the structure HAS TO be initialized before going into use.
-				if (params->inBuf->valuesLength != 0)
-				{
-					memcpy(usageInfoBuffer, params->inBuf, CpuUsageInfo_size());
-					params->inBuf->valuesLength = 0;
-					newValuesRead = true;
-				}
-
-				if (thrd_success != Mutex_unlock(params->inMtx))
-				{
-					Log(LLEVEL_ERROR, "printer: error while releasing mutex");
-				}
-
-				if (!newValuesRead)
-				{
-					break;
-				}
-
-				system("clear");
-				printFormattedCpuUsage(usageInfoBuffer);
+				Log(LLEVEL_DEBUG, "received notification on input condition variable");
+				break;
 			}
-			break;
-
-			case thrd_timedout:
+			else if (thrd_timedout == result)
 			{
-				Log(LLEVEL_WARNING, "printer: timeout while attempting to lock on mutex");
+				Log(LLEVEL_WARNING, "timeout while waiting on input condition variable");
+				break;
 			}
-			break;
-
-			default:
+			else
 			{
-				Log(LLEVEL_ERROR, "printer: error while attempting to lock on mutex");
+				Log(LLEVEL_ERROR, "error while waiting on input condition variable");
+			}
+		}
+
+		if (Thread_getKillSwitchStatus())
+		{
+			if (thrd_success != Mutex_unlock(params->inMtx))
+			{
+				Log(LLEVEL_ERROR, "couldn't release input buffer mutex");
 			}
 			break;
 		}
 
-		Thread_sleep(SLEEP_TIME_SECONDS);
+		if (!CircularBuffer_read(params->inBuf, usageInfoBuffer))
+		{
+			Log(LLEVEL_ERROR, "attempted read from empty buffer");
+		}
+
+		if (thrd_success != Mutex_unlock(params->inMtx))
+		{
+			Log(LLEVEL_ERROR, "couldn't release input buffer mutex");
+			continue;
+		}
+
+		system("clear");
+		printFormattedCpuUsage(usageInfoBuffer);
+		Log(LLEVEL_TRACE, "usage statistics printed to standard output");
 	}
 
+	Log(LLEVEL_INFO, "thread exiting");
+
 	free(usageInfoBuffer);
-	thrd_exit(returnCode);
+	thrd_exit(retval);
 
 error_exit_1:
-	thrd_exit(returnCode);
+	thrd_exit(retval);
 }

@@ -59,8 +59,9 @@ void Log(LogLevel_t logLevel, const char* format, ...);
 
 /**
  * \brief Initializes logger module. Should be called before using any other components from this module.
+ * \return 0 if successful, negative error code otherwise.
 */
-void Logger_init(void);
+int Logger_init(void);
 
 
 /**
