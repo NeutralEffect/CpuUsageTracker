@@ -58,6 +58,12 @@ static void triggerKillswitch(void)
 }
 
 
+void Watchdog_finalize(void)
+{
+	mtx_destroy(&g_activityReportsMutex);
+}
+
+
 void Watchdog_init(void)
 {
 	if (thrd_success != mtx_init(&g_activityReportsMutex, mtx_timed))

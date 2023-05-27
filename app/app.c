@@ -123,6 +123,10 @@ int main()
 	CircularBuffer_destroy(usageInfoCbuf);
 	CircularBuffer_destroy(procStatCbuf);
 
+	ThreadInfo_finalize();
+	Watchdog_finalize();
+	Logger_finalize();
+
 	system("clear");
 	printf("%-10s = %i\n", "Reader", readerResult);
 	printf("%-10s = %i\n", "Analyzer", analyzerResult);

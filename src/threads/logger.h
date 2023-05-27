@@ -58,6 +58,13 @@ void Log(LogLevel_t logLevel, const char* format, ...);
 
 
 /**
+ * \brief Finalizes logger module, cleaning up any resources used by it.
+ * Should only be called after successful call to Logger_init() and only when logger module is no longer in use.
+*/
+void Logger_finalize(void);
+
+
+/**
  * \brief Initializes logger module. Should be called before using any other components from this module.
  * \return 0 if successful, negative error code otherwise.
 */

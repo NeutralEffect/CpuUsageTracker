@@ -7,6 +7,13 @@
 
 
 /**
+ * \brief Finalizes watchdog module, cleaning up any resources used by it.
+ * Should only be called after successful call to Watchdog_init() and only when watchdog module is no longer in use.
+*/
+void Watchdog_finalize(void);
+
+
+/**
  * \brief Initializes watchdog module.
  * Has to be called before any function in this module is used.
 */

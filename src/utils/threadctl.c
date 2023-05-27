@@ -79,6 +79,12 @@ int Thread_sleepMs(unsigned milliseconds)
 }
 
 
+void ThreadInfo_finalize(void)
+{
+	tss_delete(g_tssId);
+}
+
+
 const ThreadInfo_t* ThreadInfo_get(void)
 {
 	return tss_get(g_tssId);
@@ -99,6 +105,5 @@ bool ThreadInfo_init(void)
 
 int ThreadInfo_set(ThreadInfo_t* tinfo)
 {
-	// 
 	return tss_set(g_tssId, tinfo);
 }

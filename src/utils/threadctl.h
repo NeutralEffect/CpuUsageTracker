@@ -80,6 +80,9 @@ int Thread_sleep(unsigned seconds);
 int Thread_sleepMs(unsigned milliseconds);
 
 
+void ThreadInfo_finalize(void);
+
+
 const ThreadInfo_t* ThreadInfo_get(void);
 
 

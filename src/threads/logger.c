@@ -65,6 +65,15 @@ static void timeStr(char* bufPtr, size_t bufLen)
 }
 
 
+void Logger_finalize(void)
+{
+	CircularBuffer_destroy(g_secondaryBuf);
+	CircularBuffer_destroy(g_inBuf);
+	cnd_destroy(&g_inNotEmptyCv);
+	mtx_destroy(&g_inMtx);
+}
+
+
 int Logger_init(void)
 {
 	if (thrd_success != mtx_init(&g_inMtx, mtx_timed))
