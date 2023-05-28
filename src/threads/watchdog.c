@@ -239,10 +239,6 @@ int WatchdogThread(void* rawParams)
 		{
 			Log(LLEVEL_WARNING, "timeout while waiting on timestamps condition variable");
 		}
-		else
-		{
-			Log(LLEVEL_DEBUG, "received notification on timestamps condition variable");
-		}
 
 		struct timespec now;
 		getCurrentTime(&now);
@@ -251,12 +247,13 @@ int WatchdogThread(void* rawParams)
 
 		int iiOldest = findLowestTimespecIndex((struct timespec*) g_timestamps, sizeof g_timestamps / sizeof *g_timestamps);
 
-		// Check if difference between now and oldest timestamp exceeds maximum allowed unresponsive time
-		if (timespecCompare(timespecDifference(now, g_timestamps[iiOldest]), allowedUnresponsiveTime) > 0)
+		// Check if difference between now and oldest timestamp exceeds maximum allowed unresponsive time.
+		if ((timespecCompare(timespecDifference(now, g_timestamps[iiOldest]), allowedUnresponsiveTime) > 0) &&
+			(false == Thread_getKillSwitchStatus()))
 		{
+			retval = Thread_getKillSwitchStatus() ? (iiOldest + 1) : 0;
 			triggerKillSwitch();
 			Log(LLEVEL_FATAL, "thread \"%s\" unresponsive, terminating", THREAD_NAMES[iiOldest]);
-			retval = iiOldest;
 			break;
 		}
 
