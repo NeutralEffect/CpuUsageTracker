@@ -44,6 +44,7 @@ typedef enum LogLevel
 LogLevel_t;
 
 
+#ifndef CUT_DISABLE_LOGGING
 /**
  * \brief Send formated message to the log output
  * that will be visible only at or above given logging level.
@@ -55,6 +56,9 @@ LogLevel_t;
  * \param ... Format arguments.
 */
 void Log(LogLevel_t logLevel, const char* format, ...);
+#else
+#define Log(...) ((void) 0)
+#endif // CUT_DISABLE_LOGGING
 
 
 /**
