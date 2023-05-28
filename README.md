@@ -16,4 +16,4 @@ Program is implemented through five synchronized threads communicating with each
 -->
 
 ## Documentation
-Code documentation follows Doxygen C syntax. Generated documentation can be found [here](doc).
+Code documentation follows Doxygen C syntax. Doxygen configuration file has been provided [in main directory](Doxyfile.txt).
