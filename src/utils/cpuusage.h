@@ -9,6 +9,9 @@
 #include "procstat.h"
 
 
+/**
+ * Type used to represent CPU usage value as percentage.
+*/
 typedef double PercentageValue_t;
 
 

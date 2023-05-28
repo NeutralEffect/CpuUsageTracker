@@ -52,12 +52,22 @@ static mtx_t g_inMtx;
 static cnd_t g_inNotEmptyCv;
 
 
+/**
+ * \brief Logs single message into given file.
+ * \param file File for message to be written into.
+ * \param message Message to be written.
+*/
 static void logMessage(FILE* file, const char* message)
 {
 	fputs(message, file);
 }
 
 
+/**
+ * \brief Reads all messages from given circular buffer and writes them into given file as separate lines.
+ * \param file File for messages to be written into.
+ * \param cbuf Circular buffer containing messages.
+*/
 static void logAllFromCbuf(FILE* file, CircularBuffer_t* cbuf)
 {
 	char msgbuf[LOG_MESSAGE_MAX_LENGTH];
@@ -70,6 +80,11 @@ static void logAllFromCbuf(FILE* file, CircularBuffer_t* cbuf)
 }
 
 
+/**
+ * \brief Retrieves current time and writes it into given buffer as string, formatted in "HH:MM:SS DD/MM/YYYY" format.
+ * \param bufPtr Buffer to hold resulting string.
+ * \param bufLen Maximum available length of buffer provided through bufPtr.
+*/
 static void timeStr(char* bufPtr, size_t bufLen)
 {
 	time_t now = time(NULL);

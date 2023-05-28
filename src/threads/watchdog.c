@@ -36,6 +36,11 @@ static mtx_t g_timestampsMtx;
 static cnd_t g_timestampsUpdatedCv;
 
 
+/**
+ * \brief Retrieve current time and write it into given timespec structure.
+ * \param out Pointer to timespec structure to write current time into.
+ * \return 0 on failure, different value otherwise.
+*/
 static inline int getCurrentTime(struct timespec* out)
 {
 	// Could use clock_gettime(CLOCK_REALTIME, out) instead.
@@ -43,6 +48,12 @@ static inline int getCurrentTime(struct timespec* out)
 }
 
 
+/**
+ * \brief Adds two time values represented as struct timespec, performing carryover.
+ * \param a First time value.
+ * \param b Second time value.
+ * \return Sum of both time values.
+*/
 static struct timespec timespecAdd(struct timespec a, struct timespec b)
 {
 	unsigned secs = a.tv_sec + b.tv_sec;
@@ -59,6 +70,12 @@ static struct timespec timespecAdd(struct timespec a, struct timespec b)
 }
 
 
+/**
+ * \brief Compares two time values represented as struct timespec.
+ * \param a First time value.
+ * \param b Second time value.
+ * \return 1 if a is greater than b, -1 if b is greater than a, 0 if they are equal.
+*/
 static int timespecCompare(struct timespec a, struct timespec b)
 {
 	long long int retval = a.tv_sec - b.tv_sec;
@@ -73,6 +90,13 @@ static int timespecCompare(struct timespec a, struct timespec b)
 }
 
 
+/**
+ * \brief Finds index of lowest time value from given array.
+ * \param array Array of time values represented as struct timespec.
+ * \param arrayLen Length of array.
+ * \return Index of lowest time value from given array. If there are multiple equal time values
+ * that satisfy this condition, the lowest index will be returned.
+*/
 static inline int findLowestTimespecIndex(struct timespec array[], int arrayLen)
 {
 	int iiOldest = 0;
@@ -89,6 +113,13 @@ static inline int findLowestTimespecIndex(struct timespec array[], int arrayLen)
 }
 
 
+/**
+ * \brief Computes difference between two time values represented as struct timespec.
+ * \param a First time value.
+ * \param b Second time value.
+ * \return Difference between first and second time value. If first time value was lower than second one
+ * and struct timespec implementation does not support negative values in it's fields, behavior is undefined.
+*/
 static struct timespec timespecDifference(struct timespec a, struct timespec b)
 {
 	const unsigned long long NSEC_IN_SEC = 1000000000u;
@@ -112,6 +143,11 @@ static struct timespec timespecDifference(struct timespec a, struct timespec b)
 }
 
 
+/**
+ * \brief Converts amount of time in miilliseconds to time value represented as struct timespec.
+ * \param ms Amount of milliseconds to convert.
+ * \return Time value representing given amount of milliseconds.
+*/
 static struct timespec msToTimespec(unsigned long long ms)
 {
 	unsigned secs = ms / 1000;
@@ -121,6 +157,9 @@ static struct timespec msToTimespec(unsigned long long ms)
 }
 
 
+/**
+ * \brief Triggers threads kill switch. Current implementaion does that by raising SIGTERM signal.
+*/
 static void triggerKillSwitch(void)
 {
 	if (0 != raise(SIGTERM))
