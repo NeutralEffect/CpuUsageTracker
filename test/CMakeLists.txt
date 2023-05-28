@@ -3,58 +3,67 @@ project(CpuUsageTrackerTests)
 set(CUTTESTS_CLANG_COMPILE_FLAGS ${CUT_CLANG_FLAGS})
 set(CUTTESTS_GCC_COMPILE_FLAGS ${CUT_GCC_FLAGS})
 
-
-# File utilities tests
-add_executable(FileTests file_tests.c)
+# CpuCount tests
+add_executable(CpuCountTests cpucount_tests.c)
 
 add_test(
-	NAME 	FileTests
-	COMMAND FileTests)
+	NAME 	CpuCountTests
+	COMMAND CpuCountTests
+)
 
-target_include_directories(FileTests
-	PRIVATE
+target_include_directories(CpuCountTests
+ 	PRIVATE
 		${CMAKE_SOURCE_DIR}/src/utils
-		.)
+		.
+)
 
-target_sources(FileTests PRIVATE
-	${CMAKE_SOURCE_DIR}/src/utils/file.c)
+target_sources(CpuCountTests PRIVATE
+ 	${CMAKE_SOURCE_DIR}/src/utils/cpucount.c)
 
-set_target_properties(FileTests PROPERTIES
+set_target_properties(CpuCountTests PROPERTIES
 	C_STANDARD 11
-	C_STANDARD_REQUIRED ON
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/out")
+ 	C_STANDARD_REQUIRED ON
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/out"
+)
+
+target_compile_definitions(CpuCountTests PRIVATE
+	CUT_DISABLE_LOGGING)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-	target_compile_options(FileTests PRIVATE ${CUTTESTS_CLANG_COMPILE_FLAGS})
+	target_compile_options(CpuCountTests PRIVATE ${CUTTESTS_CLANG_COMPILE_FLAGS})
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-	target_compile_options(FileTests PRIVATE ${CUTTESTS_GCC_COMPILE_FLAGS})
+	target_compile_options(CpuCountTests PRIVATE ${CUTTESTS_GCC_COMPILE_FLAGS})
 endif()
 
 
-# Thread utilities tests
-add_executable(ThreadUtilsTests thread_utils_tests.c)
+# Threadctl tests
+add_executable(ThreadctlTests threadctl_tests.c)
 
 add_test(
-	NAME 	ThreadUtilsTests
-	COMMAND ThreadUtilsTests)
+	NAME 	ThreadctlTests
+	COMMAND ThreadctlTests
+)
 
-target_include_directories(ThreadUtilsTests
-	PRIVATE
+target_include_directories(ThreadctlTests
+ 	PRIVATE
 		${CMAKE_SOURCE_DIR}/src/utils
-		.)
+		${CMAKE_SOURCE_DIR}/src/threads
+)
 
-target_sources(ThreadUtilsTests PRIVATE
-	${CMAKE_SOURCE_DIR}/src/utils/sync.c)
+target_sources(ThreadctlTests PRIVATE
+ 	${CMAKE_SOURCE_DIR}/src/utils/threadctl.c)
 
-set_target_properties(ThreadUtilsTests PROPERTIES
+set_target_properties(ThreadctlTests PROPERTIES
 	C_STANDARD 11
-	C_STANDARD_REQUIRED ON
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/out")
+ 	C_STANDARD_REQUIRED ON
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/out"
+)
 
-	
-# Set compiler-specific flags to enforce stricter rules
+target_compile_definitions(ThreadctlTests PRIVATE
+	CUT_DISABLE_LOGGING)
+
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-	target_compile_options(ThreadUtilsTests PRIVATE ${CUTTESTS_CLANG_COMPILE_FLAGS})
+	target_compile_options(ThreadctlTests PRIVATE ${CUTTESTS_CLANG_COMPILE_FLAGS})
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-	target_compile_options(ThreadUtilsTests PRIVATE ${CUTTESTS_GCC_COMPILE_FLAGS})
+	target_compile_options(ThreadctlTests PRIVATE ${CUTTESTS_GCC_COMPILE_FLAGS})
 endif()
