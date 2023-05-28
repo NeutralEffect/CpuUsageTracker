@@ -3,6 +3,8 @@ project(CircularBuffer)
 add_library(${PROJECT_NAME} STATIC
 	circbuf.c)
 
+add_subdirectory(test)
+
 target_include_directories(${PROJECT_NAME}
 	PUBLIC
 		include
