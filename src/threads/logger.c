@@ -11,13 +11,27 @@
 #include <time.h>
 
 
-#define LOG_FILE_NAME 						"cut_log.txt"
-#define LOG_TIME_STRING_MAX_LENGTH 			40
 #define LOGGER_MESSAGE_BUFFER_ITEM_COUNT 	100u
 #define LOGGER_MUTEX_WAIT_TIME_MS 			50
 #define LOGGER_CONDVAR_WAIT_TIME_MS 		2000
 #define LOGGER_THREAD_ID					TID_LOGGER
 #define LOGGER_THREAD_NAME					"Logger"
+#define LOG_FILE_NAME 						"cut_log.txt"
+#define LOG_TIME_STRING_MAX_LENGTH 			20
+#define LOG_FORMAT_TIMESTAMP				"%19s" // String format column should be one character thinner than LOG_TIME_STRING_MAX_LENGTH
+#define LOG_FORMAT_THREADNAME				"%-8s"
+
+
+static const char* BASE_FORMATS[] =
+{
+	[LLEVEL_NONE]		= "",
+	[LLEVEL_FATAL]		= LOG_FORMAT_TIMESTAMP " [F] " LOG_FORMAT_THREADNAME " :: %s\n",
+	[LLEVEL_ERROR]		= LOG_FORMAT_TIMESTAMP " [E] " LOG_FORMAT_THREADNAME " :: %s\n",
+	[LLEVEL_WARNING]	= LOG_FORMAT_TIMESTAMP " [W] " LOG_FORMAT_THREADNAME " :: %s\n",
+	[LLEVEL_INFO]		= LOG_FORMAT_TIMESTAMP " [I] " LOG_FORMAT_THREADNAME " :: %s\n",
+	[LLEVEL_DEBUG]		= LOG_FORMAT_TIMESTAMP " [D] " LOG_FORMAT_THREADNAME " :: %s\n",
+	[LLEVEL_TRACE]		= LOG_FORMAT_TIMESTAMP " [T] " LOG_FORMAT_THREADNAME " :: %s\n"
+};
 
 
 static ThreadInfo_t g_loggerThreadInfo =
@@ -112,17 +126,6 @@ void Log(LogLevel_t logLevel, const char* format, ...)
 	{
 		return;
 	}
-
-	static const char* BASE_FORMATS[] =
-	{
-		[LLEVEL_NONE]		= "",
-		[LLEVEL_FATAL]		= "%s [F] %s :: %s\n",
-		[LLEVEL_ERROR]		= "%s [E] %s :: %s\n",
-		[LLEVEL_WARNING]	= "%s [W] %s :: %s\n",
-		[LLEVEL_INFO]		= "%s [I] %s :: %s\n",
-		[LLEVEL_DEBUG]		= "%s [D] %s :: %s\n",
-		[LLEVEL_TRACE]		= "%s [T] %s :: %s\n"
-	};
 
 	char msgbuf[LOG_MESSAGE_MAX_LENGTH];
 	char outbuf[LOG_MESSAGE_MAX_LENGTH];
