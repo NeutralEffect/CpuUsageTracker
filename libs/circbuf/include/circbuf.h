@@ -155,7 +155,7 @@ void CircularBuffer_write(CircularBuffer_t* self, const void* itemPtr);
 
 
 /**
- * \brief Writes many new items to give circular buffer, overwriting old items if necessary.
+ * \brief Writes many new items to given circular buffer, overwriting old items if necessary.
  * \param self Circular buffer for item to be written to.
  * \param inputBuffer Array containing items to be written into buffer.
  * \param itemCount Amount of items to be written into buffer.
