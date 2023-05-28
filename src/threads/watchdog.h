@@ -17,6 +17,7 @@ void Watchdog_finalize(void);
 /**
  * \brief Initializes watchdog module.
  * Has to be called before any function in this module is used.
+ * \return True if initialization was successful, false otherwise.
 */
 bool Watchdog_init(void);
 
