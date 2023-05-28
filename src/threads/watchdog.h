@@ -4,6 +4,7 @@
 */
 #ifndef WATCHDOG_H_INCLUDED
 #define WATCHDOG_H_INCLUDED
+#include <stdbool.h>
 
 
 /**
@@ -17,7 +18,7 @@ void Watchdog_finalize(void);
  * \brief Initializes watchdog module.
  * Has to be called before any function in this module is used.
 */
-void Watchdog_init(void);
+bool Watchdog_init(void);
 
 
 /**

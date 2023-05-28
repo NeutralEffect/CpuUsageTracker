@@ -2,17 +2,18 @@
 #include "sync.h"
 #include "logger.h"
 #include "threadctl.h"
+#include "helpers.h"
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 
-#define WATCHDOG_ALLOWED_UNRESPONSIVE_SECONDS 	2u
-#define WATCHDOG_MUTEX_WAIT_TIME_MS 			50u
-#define WATCHDOG_SLEEP_TIME_MILLISECONDS		1000
-#define WATCHDOG_THREAD_ID						TID_WATCHDOG
-#define WATCHDOG_THREAD_NAME					"Watchdog"
+#define WATCHDOG_ALLOWED_UNRESPONSIVE_MS 	2000u
+#define WATCHDOG_MUTEX_WAIT_TIME_MS 		50u
+#define WATCHDOG_THREAD_ID					TID_WATCHDOG
+#define WATCHDOG_THREAD_NAME				"Watchdog"		
 
 
 static ThreadInfo_t g_watchdogThreadInfo =
@@ -21,9 +22,71 @@ static ThreadInfo_t g_watchdogThreadInfo =
 	.name 	= WATCHDOG_THREAD_NAME
 };
 
+static const char* THREAD_NAMES[TID_COUNT_] =
+{
+	[TID_READER]	= "Reader",
+	[TID_ANALYZER]	= "Analyzer",
+	[TID_PRINTER]	= "Printer",
+	[TID_LOGGER]	= "Logger",
+	[TID_WATCHDOG]	= "Watchdog"
+};
 
-static volatile struct timespec g_activityReports[TID_COUNT_];
-static mtx_t g_activityReportsMutex;
+static volatile struct timespec g_timestamps[TID_COUNT_];
+static mtx_t g_timestampsMtx;
+static cnd_t g_timestampsUpdatedCv;
+
+
+static inline int getCurrentTime(struct timespec* out)
+{
+	// Could use clock_gettime(CLOCK_REALTIME, out) instead.
+	return timespec_get(out, TIME_UTC);
+}
+
+
+static struct timespec timespecAdd(struct timespec a, struct timespec b)
+{
+	unsigned secs = a.tv_sec + b.tv_sec;
+	unsigned nsecs = a.tv_nsec + b.tv_nsec;
+
+	if (nsecs > 1000000000)
+	{
+		nsecs -= 1000000000;
+		++secs;
+	}
+
+	struct timespec result = { .tv_sec = secs, .tv_nsec = nsecs };
+	return result;
+}
+
+
+static int timespecCompare(struct timespec a, struct timespec b)
+{
+	long long int retval = a.tv_sec - b.tv_sec;
+
+	if (retval == 0)
+	{
+		retval = a.tv_nsec - b.tv_nsec;
+	}
+
+	// Return -1, 0 or 1 depending on retval sign.
+	return (retval > 0) ? 1 : ((retval < 1) ? -1 : 0);
+}
+
+
+static inline int findLowestTimespecIndex(struct timespec array[], int arrayLen)
+{
+	int iiOldest = 0;
+	
+	for (int ii = 0; ii < arrayLen; ++ii)
+	{
+		if (timespecCompare(array[ii], array[iiOldest]) < 0)
+		{
+			iiOldest = ii;
+		}
+	}
+
+	return iiOldest;
+}
 
 
 static struct timespec timespecDifference(struct timespec a, struct timespec b)
@@ -49,7 +112,16 @@ static struct timespec timespecDifference(struct timespec a, struct timespec b)
 }
 
 
-static void triggerKillswitch(void)
+static struct timespec msToTimespec(unsigned long long ms)
+{
+	unsigned secs = ms / 1000;
+	unsigned nsecs = (ms - secs * 1000) * 1000000;
+	struct timespec result = { .tv_sec = secs, .tv_nsec = nsecs };
+	return result;
+}
+
+
+static void triggerKillSwitch(void)
 {
 	if (0 != raise(SIGTERM))
 	{
@@ -60,17 +132,28 @@ static void triggerKillswitch(void)
 
 void Watchdog_finalize(void)
 {
-	mtx_destroy(&g_activityReportsMutex);
+	mtx_destroy(&g_timestampsMtx);
 }
 
 
-void Watchdog_init(void)
+bool Watchdog_init(void)
 {
-	if (thrd_success != mtx_init(&g_activityReportsMutex, mtx_timed))
+	if (thrd_success != mtx_init(&g_timestampsMtx, mtx_timed))
 	{
-		// Highly unlikely for this error to arise
+		// Nigh impossible for this error to arise
 		Log(LLEVEL_FATAL, "cannot create mutex for watchdog module");
+		return false;
 	}
+
+	if (thrd_success != cnd_init(&g_timestampsUpdatedCv))
+	{
+		// Nigh impossible for this error to arise
+		Log(LLEVEL_FATAL, "cannot create condition variable for watchdog module");
+		mtx_destroy(&g_timestampsMtx);
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -85,18 +168,26 @@ void Watchdog_reportActive(void)
 		return;
 	}
 
-	if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, MAX_LOCK_TIME_MS))
+	if (thrd_success == Mutex_tryLockMs(&g_timestampsMtx, MAX_LOCK_TIME_MS))
 	{
 		// We need to discard the volatile qualifier; it is safe to do so since we're mutex-locked.
-		clock_gettime(CLOCK_REALTIME, (struct timespec*) &g_activityReports[thrdInfo->tid]);
+		getCurrentTime((struct timespec*) &g_timestamps[thrdInfo->tid]);
 
 		// It's possible for error to arise while unlocking mutex,
 		// but handling it here is unproductive.
-		Mutex_unlock(&g_activityReportsMutex);
+		if (thrd_success != Mutex_unlock(&g_timestampsMtx))
+		{
+			Log(LLEVEL_ERROR, "couldn't release timestamps mutex");
+		}
+
+		if (thrd_success != CondVar_notify(&g_timestampsUpdatedCv))
+		{
+			Log(LLEVEL_ERROR, "couldn't notify on timestamps condition variable");
+		}
 	}
 	else
 	{
-		Log(LLEVEL_ERROR, "cannot report activity");
+		Log(LLEVEL_ERROR, "couldn't acquire timestamps mutex");
 	}
 }
 
@@ -114,75 +205,71 @@ int WatchdogThread(void* rawParams)
 		thrd_exit(retval);
 	}
 
-	static const char* THREAD_NAMES[TID_COUNT_] =
-	{
-		[TID_READER]	= "Reader",
-		[TID_ANALYZER]	= "Analyzer",
-		[TID_PRINTER]	= "Printer",
-		[TID_LOGGER]	= "Logger",
-		[TID_WATCHDOG]	= "Watchdog"
-	};
+	// Initialize timeout before entering mutex lock
+	const struct timespec allowedUnresponsiveTime = msToTimespec(WATCHDOG_ALLOWED_UNRESPONSIVE_MS);
+	struct timespec timeoutPoint;
+	getCurrentTime(&timeoutPoint);
 
-	// Initialize activity reports with current time value
-	// to prevent them from being instantly recognized as unresponsive
-	if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, WATCHDOG_MUTEX_WAIT_TIME_MS))
+	if (thrd_success != Mutex_tryLockMs(&g_timestampsMtx, WATCHDOG_MUTEX_WAIT_TIME_MS))
 	{
-		struct timespec now;
-		clock_gettime(CLOCK_REALTIME, &now);
-		
-		for (int ii = 0; ii < TID_COUNT_; ++ii)
-		{
-			g_activityReports[ii] = now;
-		}
-		
-		if (thrd_success != Mutex_unlock(&g_activityReportsMutex))
-		{
-			Log(LLEVEL_ERROR, "cannot release mutex");
-		}
+		Log(LLEVEL_FATAL, "cannot acquire timestamps mutex");
+		retval = -2;
+		thrd_exit(retval);
 	}
 
-	while (!Thread_getKillSwitchStatus())
+	// Initialize timestamps to make sure threads won't be falsely detected as unresponsive.
+	for (unsigned ii = 0; ii < sizeof g_timestamps / sizeof *g_timestamps; ++ii)
 	{
-		Watchdog_reportActive();
-		
-		struct timespec reportsCopy[TID_COUNT_];
+		g_timestamps[ii] = timeoutPoint;
+	}
 
-		if (thrd_success == Mutex_tryLockMs(&g_activityReportsMutex, WATCHDOG_MUTEX_WAIT_TIME_MS))
+	// Currently timeoutPoint holds (almost) current time; offset it by allowed unresponsive time.
+	timeoutPoint = timespecAdd(timeoutPoint, allowedUnresponsiveTime);
+
+	while (false == Thread_getKillSwitchStatus())
+	{
+		int result = CondVar_waitUntil(&g_timestampsUpdatedCv, &g_timestampsMtx, &timeoutPoint);
+
+		if (thrd_error == result)
 		{
-			// Discard volatile on g_activityReports since we're mutex-locked.
-			memcpy(reportsCopy, (void*) g_activityReports, sizeof(g_activityReports));
-			
-			if (thrd_success != Mutex_unlock(&g_activityReportsMutex))
-			{
-				Log(LLEVEL_ERROR, "cannot release mutex");
-			}
+			Log(LLEVEL_ERROR, "error while waiting on tiemstamps condition variable");
+			continue;
+		}
+		else if (thrd_timedout == result)
+		{
+			Log(LLEVEL_WARNING, "timeout while waiting on timestamps condition variable");
+		}
+		else
+		{
+			Log(LLEVEL_DEBUG, "received notification on timestamps condition variable");
 		}
 
 		struct timespec now;
-		clock_gettime(CLOCK_REALTIME, &now);
+		getCurrentTime(&now);
+		// Ensure we won't detect Watchdog thread as unresponsive
+		g_timestamps[TID_WATCHDOG] = now;
 
-		int unresponsiveThreads = 0;
+		int iiOldest = findLowestTimespecIndex((struct timespec*) g_timestamps, sizeof g_timestamps / sizeof *g_timestamps);
 
-		for (int ii = 0; ii < TID_COUNT_; ++ii)
+		// Check if difference between now and oldest timestamp exceeds maximum allowed unresponsive time
+		if (timespecCompare(timespecDifference(now, g_timestamps[iiOldest]), allowedUnresponsiveTime) > 0)
 		{
-			struct timespec diff = timespecDifference(now, reportsCopy[ii]);
-			if (diff.tv_sec > WATCHDOG_ALLOWED_UNRESPONSIVE_SECONDS)
-			{
-				++unresponsiveThreads;
-				Log(LLEVEL_FATAL, "thread \"%s\" is unresponsive", THREAD_NAMES[ii]);
-			}
-		}
-
-		if (unresponsiveThreads > 0)
-		{
-			Log(LLEVEL_FATAL, "terminating program due to unresponsive threads");
-			system("clear");
-			printf("Unresponsive threads, terminating program...\n");
-			triggerKillswitch();
+			triggerKillSwitch();
+			Log(LLEVEL_FATAL, "thread \"%s\" unresponsive, terminating", THREAD_NAMES[iiOldest]);
+			retval = iiOldest;
 			break;
 		}
 
-		Thread_sleepMs(WATCHDOG_SLEEP_TIME_MILLISECONDS);
+		// Update time point for next check
+		timeoutPoint = timespecAdd(g_timestamps[iiOldest], allowedUnresponsiveTime);
+	}
+
+	if (thrd_success != Mutex_unlock(&g_timestampsMtx))
+	{
+		Log(LLEVEL_ERROR, "couldn't release timestamps mutex");
+		retval = -3;
+		// Relying on thrd_exit immediately after this block could easily introduce a bug.
+		thrd_exit(retval);
 	}
 
 	Log(LLEVEL_INFO, "thread exiting");
