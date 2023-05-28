@@ -151,7 +151,7 @@ bool CircularBuffer_peek(const CircularBuffer_t* self, void* itemOutPtr)
 
 	memcpy(itemOutPtr, readPtr, self->itemSize);
 
-	return false;
+	return true;
 }
 
 
