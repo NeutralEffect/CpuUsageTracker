@@ -53,6 +53,7 @@ static ProcStat_t* parse(char* mutableFileContent)
 	// Scan "cpu(N)" lines into structure
 	for (int ii = 0; ii < significantLinesCount; ++ii)
 	{
+		// FIXME: Hard-coded indexes could result in errors if the structure of the /proc/stat file is not as expected.
 		sscanf(
 			linesQueue[ii],
 			SSCANF_FORMAT,
